@@ -18,7 +18,6 @@ namespace Portfolio.Tests
 
             _configuration = new ConfigurationBuilder()
                 .SetBasePath(ProjectPath)
-                //.AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
                 .Build();
         }
 

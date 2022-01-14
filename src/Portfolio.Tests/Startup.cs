@@ -1,11 +1,11 @@
 using Amazon.DynamoDBv2.DataModel;
-using Castle.Core.Configuration;
 using Portfolio.Api.Configuration;
 using Portfolio.Api.Filters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Microsoft.Extensions.Configuration;
 
 namespace Portfolio.Tests
 {

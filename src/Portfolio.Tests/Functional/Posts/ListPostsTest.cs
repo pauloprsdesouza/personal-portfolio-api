@@ -2,6 +2,8 @@ using System.Threading.Tasks;
 using Portfolio.Tests.Fakes;
 using Xunit;
 using Portfolio.Api.Models.Posts;
+using System.Text.Json;
+using Portfolio.Api.Configuration;
 
 namespace Portfolio.Tests.Functional.Posts
 {
@@ -22,11 +24,15 @@ namespace Portfolio.Tests.Functional.Posts
             PostRequest post = new PostRequest();
             post.Title = "Teste";
 
-            // _client.PostJsonAsync("/posts", post);
+            var response = await _client.PostJsonAsync("/posts", post);
 
-            // var teste = 0;
+            var responseJson = await response.Content.ReadAsStringAsync();
 
-            Assert.Equal(3, 3);
+            var jsonOption = new JsonSerializerOptions().Default();
+
+            var responseDoAmor = JsonSerializer.Deserialize<PostResponse>(responseJson, jsonOption);
+
+            Assert.Equal(post.Title, responseDoAmor.Title);
         }
     }
 }
