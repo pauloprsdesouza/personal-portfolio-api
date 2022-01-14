@@ -19,10 +19,17 @@ namespace Portfolio.Tests.Functional.Posts
         }
 
         [Fact]
-        public async Task ShouldFind()
+        public async Task ShouldCreatePost()
         {
             PostRequest post = new PostRequest();
             post.Title = "Teste";
+                post.Title = "Title";
+                post.Subtitle = "Subtitle";
+                post.CategoryId = "01FPSZ1HQYS0G5N44GA43KZSKZ";
+                post.Status = "P";
+                post.FrontImageUrl = "https://";
+                post.ReadingTime = "12";
+                post.Content = "Content";
 
             var response = await _client.PostJsonAsync("/posts", post);
 
@@ -30,9 +37,14 @@ namespace Portfolio.Tests.Functional.Posts
 
             var jsonOption = new JsonSerializerOptions().Default();
 
-            var responseDoAmor = JsonSerializer.Deserialize<PostResponse>(responseJson, jsonOption);
+            var postResponse = JsonSerializer.Deserialize<PostResponse>(responseJson, jsonOption);
 
-            Assert.Equal(post.Title, responseDoAmor.Title);
+            Assert.Equal(post.Title, postResponse.Title);
+            Assert.Equal(post.Subtitle, postResponse.Subtitle);
+            Assert.Equal(post.Status, postResponse.Status);
+            Assert.Equal(post.FrontImageUrl, postResponse.FrontImageUrl);
+            Assert.Equal(post.ReadingTime, postResponse.ReadingTime);
+            Assert.Equal(post.Content, postResponse.Content);
         }
     }
 }
