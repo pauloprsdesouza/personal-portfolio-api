@@ -1,0 +1,42 @@
+@postId = 01FPRHPPW1HQSJHJ5ANQTNNMX2
+
+GET {{baseUrl}}/posts
+Content-Type: application/json
+
+###
+
+GET {{baseUrl}}/posts/{{postId}}
+Content-Type: application/json
+
+###
+
+POST {{baseUrl}}/posts
+Content-Type: application/json
+
+{
+  "title": "Post's Title",
+  "subtitle": "Post's Subtitle",
+  "status": "d",
+  "category": "Technology",
+  "frontImageUrl": "https://www.notion.so/cdn-cgi/image/format=auto,width=1080,quality=100/front-static/pages/product/home-page-hero-refreshed-v3.png",
+  "content": "<h1>Post's Content</h1>"
+}
+
+###
+
+PUT {{baseUrl}}/posts/{{postId}}
+Content-Type: application/json
+
+{
+  "title": "Post's Title",
+  "subtitle": "Post's Subtitle",
+  "status": "p",
+  "category": "Technology",
+  "frontImageUrl": "https://www.notion.so/cdn-cgi/image/format=auto,width=1080,quality=100/front-static/pages/product/home-page-hero-refreshed-v3.png",
+  "content": "<h1>Post's Content</h1>"
+}
+
+###
+
+DELETE {{baseUrl}}/posts/{{postId}}
+Content-Type: application/json
