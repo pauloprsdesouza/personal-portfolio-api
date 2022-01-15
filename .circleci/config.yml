@@ -1,20 +1,7 @@
 version : 2.1
 
-commands:
-  codecov:
-    parameters:
-      file:
-        type: string
-    steps:
-      - run:
-          name: Download Codecov script
-          command: curl -s https://codecov.io/bash > ./codecov
-      - run:
-          name: Make Codecov script executable
-          command: chmod +x ./codecov
-      - run:
-          name: Send coverage report
-          command: ./codecov -f << parameters.file >> -t $CODECOV_TOKEN
+orbs:
+  codecov: codecov/codecov@3.0.0
 
 jobs:
   build_api:
@@ -22,8 +9,6 @@ jobs:
       api_base_dir:
         type: string
       api_tests_dir:
-        type: string
-      dotnet_version:
         type: string
     docker:
     - image: mcr.microsoft.com/dotnet/core/sdk:3.1.416
@@ -45,12 +30,8 @@ jobs:
           name: Run Build
           command: dotnet build
           working_directory: << parameters.api_base_dir >>
-      - codecov:
-          file: << parameters.api_tests_dir >>/coverage/opencover.xml
-      - store_artifacts:
-          path: << parameters.api_tests_dir >>/coverage/report/summary.htm
-          destination: << parameters.api_tests_dir >>/coverage-report.htm
-
+      - codecov/upload:
+          token: CODECOV_TOKEN
 
 workflows:
   version: 2.1
@@ -60,4 +41,3 @@ workflows:
           name: build-rest-api
           api_base_dir: src/Portfolio.Api
           api_tests_dir: src/Portfolio.Tests
-          dotnet_version: "3.1.100"
