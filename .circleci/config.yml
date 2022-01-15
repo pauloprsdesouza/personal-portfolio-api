@@ -17,9 +17,8 @@ commands:
           command: ./codecov -f << parameters.file >> -t $CODECOV_TOKEN
 
 executors:
-  ubuntu:
-    machine:
-      image: circleci/classic:latest
+  docker:
+      - image: mcr.microsoft.com/dotnet/core/sdk:3.1.416
 
 jobs:
   build_api:
@@ -30,19 +29,31 @@ jobs:
         type: string
       dotnet_version:
         type: string
-    executor: ubuntu
-    working_directory: ~/project
+    executor: docker
     steps:
-      - checkout:
-          path: ~/project
-      - run: sudo sysctl -n -w fs.inotify.max_user_instances=512
-      - run: sudo ./tools/install-dotnet.sh << parameters.dotnet_version >>
-      - run: sudo ./tools/test.sh
+      - checkout
+      - run:
+          name: Restore Packages API
+          command: dotnet restore
+          working_directory: << parameters.api_base_dir >>
+      - run:
+          name: Restore Packages Tests
+          command: dotnet restore
+          working_directory: << parameters.api_tests_dir >>
+      - run:
+          name: Run Tests
+          command: dotnet test
+          working_directory: << parameters.api_tests_dir >>
+      - run:
+          name: Run Build
+          command: dotnet build
+          working_directory: << parameters.api_base_dir >>
       - codecov:
           file: << parameters.api_tests_dir >>/coverage/opencover.xml
       - store_artifacts:
           path: << parameters.api_tests_dir >>/coverage/report/summary.htm
           destination: << parameters.api_base_dir >>/coverage-report.htm
+
 
 workflows:
   version: 2.1
