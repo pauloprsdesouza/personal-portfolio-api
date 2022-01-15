@@ -1,5 +1,8 @@
 version : 2.1
 
+orbs:
+  codecov: codecov/codecov@3.0.0
+
 jobs:
   build:
     docker:
@@ -22,3 +25,5 @@ jobs:
           name: Run Build
           command: dotnet build
           working_directory: src/Portfolio.Api
+      - codecov/upload:
+          token: CODECOV_TOKEN
