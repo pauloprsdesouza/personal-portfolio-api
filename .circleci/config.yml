@@ -36,8 +36,8 @@ jobs:
       - checkout:
           path: ~/project
       - run: sudo sysctl -n -w fs.inotify.max_user_instances=512
-      - run: ./tools/install-dotnet.sh << parameters.dotnet_version >>
-      - run: ./tools/test.sh
+      - run: sudo ./tools/install-dotnet.sh << parameters.dotnet_version >>
+      - run: sudo ./tools/test.sh
       - codecov:
           file: << parameters.api_tests_dir >>/coverage/opencover.xml
       - store_artifacts:
