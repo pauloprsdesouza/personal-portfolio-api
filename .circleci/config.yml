@@ -1,30 +1,20 @@
 version : 2.1
 
-executors:
-  ubuntu:
-    machine:
-      image: circleci/classic:latest
-
 jobs:
   build:
-    executor: ubuntu
+    docker:
+      - image: mcr.microsoft.com/dotnet/core/sdk:2.2
     steps:
       - checkout
       - run:
-          name: Restore
-          command: dotnet restore
-          working_directory: Portfolio.Api
+        name: Restore Packages
+        command:
+          dotnet restore
       - run:
-          name: Build
-          command: dotnet build -c Release
-          working_directory: Portfolio.Api
+        name: Run Tests
+        command:
+          dotnet test
       - run:
-          name: Running Tests
-          command: dotnet test
-          working_directory: Portfolio.Tests
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run:
-          name: Build and push Docker image
-          command: |
-            docker build -t Portfolio .
+        name: Run Build
+        command:
+          dotnet build
