@@ -1,28 +1,32 @@
-version: 2
+version : 2.1
+
+executors:
+  ubuntu:
+    machine:
+      image: circleci/classic:latest
+
 jobs:
-  build:
-    docker:
-      - image: jetcipher/circleci-dotnet-core:3.0
+  build_api:
+    parameters:
+      api_base_dir:
+        type: string
+      api_tests_dir:
+        type: string
+      dotnet_version:
+        type: string
+    executor: ubuntu
+    working_directory: ~/project
     steps:
-      - checkout
-      - run:
-          name: Restore
-          command: dotnet restore
-          working_directory: src/Portfolio.Api
-      - run:
-          name: Build
-          command: dotnet build -c Release
-          working_directory: src/Portfolio.Api
-      - run:
-          name: Running Tests
-          command: dotnet test
-          working_directory: src/Portfolio.Tests
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run:
-          name: Build and push Docker image
-          command: |
-            docker build -t Portfolio .
-            echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
-            docker tag boku herocod3r/Portfolio
-            docker push herocod3r/Portfolio
+      - checkout:
+          path: ~/project
+      - run: sudo sysctl -n -w fs.inotify.max_user_instances=512
+
+workflows:
+  version: 2.1
+  rest_api:
+    jobs:
+      - build_api:
+          name: build-rest-api
+          api_base_dir: src/Portfolio.Api
+          api_tests_dir: src/Portfolio.Tests
+          dotnet_version: "3.1.100"
