@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  codecov: codecov/codecov@3.0.0
+
 executors:
   dotnet-executor:
     docker:
@@ -37,8 +40,6 @@ jobs:
 workflows:
   version: 2.1
   rest_api:
-    orbs:
-      codecov: codecov/codecov@3.0.0
     jobs:
       - build_api:
           name: build-rest-api
