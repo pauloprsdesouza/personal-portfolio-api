@@ -1,4 +1,6 @@
-[![CircleCI](https://circleci.com/gh/pauloprsdesouza/personal-portfolio-api.svg?style=svg)](https://circleci.com/gh/pauloprsdesouza/personal-portfolio-api)
+[![CircleCI](https://img.shields.io/circleci/build/gh/pauloprsdesouza/personal-portfolio-api)](https://circleci.com/gh/pauloprsdesouza/personal-portfolio-api)
+
+![CircleCI](https://img.shields.io/circleci/build/gh/pauloprsdesouza/personal-portfolio-api)
 
 # A REST Api for my personal-portfolio
 
