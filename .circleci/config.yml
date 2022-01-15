@@ -25,7 +25,7 @@ jobs:
         type: string
       dotnet_version:
         type: string
-    docker: 
+    docker:
     - image: mcr.microsoft.com/dotnet/core/sdk:3.1.416
     steps:
       - checkout
@@ -49,7 +49,7 @@ jobs:
           file: << parameters.api_tests_dir >>/coverage/opencover.xml
       - store_artifacts:
           path: << parameters.api_tests_dir >>/coverage/report/summary.htm
-          destination: << parameters.api_base_dir >>/coverage-report.htm
+          destination: << parameters.api_tests_dir >>/coverage-report.htm
 
 
 workflows:
