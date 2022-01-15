@@ -1,9 +1,13 @@
 version : 2.1
 
+executors:
+  ubuntu:
+    machine:
+      image: circleci/classic:latest
+
 jobs:
   build:
-    docker:
-      - image: jetcipher/circleci-dotnet-core:3.1
+    executor: ubuntu
     steps:
       - checkout
       - run:
@@ -24,6 +28,3 @@ jobs:
           name: Build and push Docker image
           command: |
             docker build -t Portfolio .
-            echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
-            docker tag boku herocod3r/Portfolio
-            docker push herocod3r/Portfolio
