@@ -7,9 +7,12 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Restore Packages
+          name: Restore Packages API
           command: dotnet restore
           working_directory: src/Portfolio.Api
+      - run:
+          name: Restore Packages Tests
+          command: dotnet restore
           working_directory: src/Portfolio.Tests
       - run:
           name: Run Tests
