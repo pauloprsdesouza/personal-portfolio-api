@@ -3,7 +3,7 @@ version : 2.1
 jobs:
   build:
     docker:
-      - image: mcr.microsoft.com/dotnet/core/sdk:2.2
+      - image: mcr.microsoft.com/dotnet/core/sdk:6.0
     steps:
       - checkout
       - run:
