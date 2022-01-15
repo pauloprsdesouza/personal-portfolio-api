@@ -6,27 +6,27 @@ executors:
       image: circleci/classic:latest
 
 jobs:
-  build_api:
-    parameters:
-      api_base_dir:
-        type: string
-      api_tests_dir:
-        type: string
-      dotnet_version:
-        type: string
-    executor: ubuntu
-    working_directory: ~/project
+  test:
+    description: Setup and run application tests
     steps:
-      - checkout:
-          path: ~/project
-      - run: sudo sysctl -n -w fs.inotify.max_user_instances=512
-
+      - checkout
+      - run:
+          name: "Install project dependencies"
+          command: dotnet restore
+      - run:
+          name: "Run Application Tests"
+          command: dotnet test
+  build:
+    description: Build application with Release configuration
+    steps:
+      - checkout
+      - run:
+          name: "Build Application according to some given configuration"
+          command: dotnet build
 workflows:
-  version: 2.1
-  rest_api:
+  test_and_build:
     jobs:
-      - build_api:
-          name: build-rest-api
-          api_base_dir: src/Portfolio.Api
-          api_tests_dir: src/Portfolio.Tests
-          dotnet_version: "3.1.100"
+      - test
+      - build:
+          requires:
+            - test
