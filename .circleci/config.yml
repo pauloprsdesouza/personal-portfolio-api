@@ -8,13 +8,14 @@ jobs:
       - checkout
       - run:
           name: Restore Packages
-          command:
-            dotnet restore
+          command: dotnet restore
+          working_directory: src/Portfolio.Api
+          working_directory: src/Portfolio.Tests
       - run:
           name: Run Tests
-          command:
-            dotnet test
+          command: dotnet test
+          working_directory: src/Portfolio.Tests
       - run:
           name: Run Build
-          command:
-            dotnet build
+          command: dotnet build
+          working_directory: src/Portfolio.Api
