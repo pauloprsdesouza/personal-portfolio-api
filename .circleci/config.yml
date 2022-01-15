@@ -1,7 +1,7 @@
-version : 2.1
-
-orbs:
-  codecov: codecov/codecov@3.0.0
+executors:
+  dotnet-executor:
+    docker:
+      - image: mcr.microsoft.com/dotnet/core/sdk:3.1.416
 
 jobs:
   build_api:
@@ -10,8 +10,7 @@ jobs:
         type: string
       api_tests_dir:
         type: string
-    docker:
-    - image: mcr.microsoft.com/dotnet/core/sdk:3.1.416
+    executor: dotnet-executor
     steps:
       - checkout
       - run:
@@ -35,6 +34,8 @@ jobs:
 
 workflows:
   version: 2.1
+  orbs:
+    codecov: codecov/codecov@3.0.0
   rest_api:
     jobs:
       - build_api:
