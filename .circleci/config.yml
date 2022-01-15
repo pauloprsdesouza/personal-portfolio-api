@@ -7,14 +7,14 @@ jobs:
     steps:
       - checkout
       - run:
-        name: Restore Packages
-        command:
-          dotnet restore
+          name: Restore Packages
+          command:
+            dotnet restore
       - run:
-        name: Run Tests
-        command:
-          dotnet test
+          name: Run Tests
+          command:
+            dotnet test
       - run:
-        name: Run Build
-        command:
-          dotnet build
+          name: Run Build
+          command:
+            dotnet build
