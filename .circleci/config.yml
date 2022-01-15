@@ -16,10 +16,6 @@ commands:
           name: Send coverage report
           command: ./codecov -f << parameters.file >> -t $CODECOV_TOKEN
 
-executors:
-  docker:
-      - image: mcr.microsoft.com/dotnet/core/sdk:3.1.416
-
 jobs:
   build_api:
     parameters:
@@ -29,7 +25,8 @@ jobs:
         type: string
       dotnet_version:
         type: string
-    executor: docker
+    docker: 
+    - image: mcr.microsoft.com/dotnet/core/sdk:3.1.416
     steps:
       - checkout
       - run:
