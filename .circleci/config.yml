@@ -27,24 +27,21 @@ jobs:
         type: string
     docker:
     - image: mcr.microsoft.com/dotnet/core/sdk:3.1.416
+    working_directory: ~/project
     steps:
       - checkout
       - run:
           name: Restore Packages API
           command: dotnet restore
-          working_directory: << parameters.api_base_dir >>
       - run:
           name: Restore Packages Tests
           command: dotnet restore
-          working_directory: << parameters.api_tests_dir >>
       - run:
           name: Run Tests
           command: dotnet test
-          working_directory: << parameters.api_tests_dir >>
       - run:
           name: Run Build
           command: dotnet build
-          working_directory: << parameters.api_base_dir >>
       - codecov:
           file: << parameters.api_tests_dir >>/coverage/opencover.xml
       - store_artifacts:
