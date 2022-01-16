@@ -37,6 +37,8 @@ jobs:
                   /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage"
                   /p:AltCoverAssemblyExcludeFilter="System(.*)|xunit|<< parameters.api_tests_dir >>|<< parameters.api_base_dir >>.Views"
 
+                  dotnet tool install -g dotnet-reportgenerator-globaltool
+
                   dotnet reportgenerator
                   "-reports:<< parameters.api_tests_dir >>/coverage/opencover.xml"
                   "-reporttypes:Html;HtmlSummary"
