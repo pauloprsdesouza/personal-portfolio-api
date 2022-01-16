@@ -29,6 +29,7 @@ jobs:
       - run:
           name: Run Tests
           command: dotnet tool install -g dotnet-reportgenerator-globaltool
+
                    dotnet test
                    /p:AltCover="true"
                    /p:AltCoverForce="true"
