@@ -1,12 +1,25 @@
-version: 2.1
+version : 2.1
 
-orbs:
-  codecov: codecov/codecov@3.0.0
+commands:
+  codecov:
+    parameters:
+      file:
+        type: string
+    steps:
+      - run:
+          name: Download Codecov script
+          command: curl -s https://codecov.io/bash > ./codecov
+      - run:
+          name: Make Codecov script executable
+          command: chmod +x ./codecov
+      - run:
+          name: Send coverage report
+          command: ./codecov -f << parameters.file >> -t $CODECOV_TOKEN
 
 executors:
-  dotnet-executor:
-    docker:
-      - image: mcr.microsoft.com/dotnet/core/sdk:3.1.416
+  ubuntu:
+    machine:
+      image: circleci/classic:latest
 
 jobs:
   build_api:
@@ -15,42 +28,21 @@ jobs:
         type: string
       api_tests_dir:
         type: string
-    executor: dotnet-executor
+      dotnet_version:
+        type: string
+    executor: ubuntu
+    working_directory: ~/project
     steps:
-      - checkout
-      - run:
-          name: Restore Packages API
-          command: dotnet restore
-          working_directory: << parameters.api_base_dir >>
-      - run:
-          name: Restore Packages Tests
-          command: dotnet restore
-          working_directory: << parameters.api_tests_dir >>
-      - run:
-          name: Run Tests
-          command: dotnet tool install -g dotnet-reportgenerator-globaltool
-
-                   dotnet test
-                   /p:AltCover="true"
-                   /p:AltCoverForce="true"
-                   /p:AltCoverOpenCover="true"
-                   /p:AltCoverXmlReport="coverage/opencover.xml"
-                   /p:AltCoverInputDirectory="<< parameters.api_base_dir >>"
-                   /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage"
-                   /p:AltCoverAssemblyExcludeFilter="System(.*)|xunit|<< parameters.api_tests_dir >>|<< parameters.api_base_dir >>.Views"
-
-                   dotnet-reportgenerator-globaltool
-                   -reports:"<< parameters.api_tests_dir >>/coverage/opencover.xml"
-                   -targetdir:"coveragereport"
-                   -reporttypes:Html
-          working_directory: << parameters.api_tests_dir >>
-      - run:
-          name: Run Build
-          command: dotnet build
-          working_directory: << parameters.api_base_dir >>
-      - codecov/upload:
-          token: CODECOV_TOKEN
+      - checkout:
+          path: ~/project
+      - run: sudo sysctl -n -w fs.inotify.max_user_instances=512
+      - run: ./tools/install-dotnet.sh << parameters.dotnet_version >>
+      - run: ./tools/test.sh
+      - codecov:
           file: << parameters.api_tests_dir >>/coverage/opencover.xml
+      - store_artifacts:
+          path: << parameters.api_tests_dir >>/coverage/report/summary.htm
+          destination: << parameters.api_base_dir >>/coverage-report.htm
 
 workflows:
   version: 2.1
@@ -60,3 +52,4 @@ workflows:
           name: build-rest-api
           api_base_dir: src/Portfolio.Api
           api_tests_dir: src/Portfolio.Tests
+          dotnet_version: "3.1.100"
