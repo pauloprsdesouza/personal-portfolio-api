@@ -23,6 +23,6 @@ dotnet tool install --tool-path tools dotnet-reportgenerator-globaltool
 ./tools/reportgenerator \
   "-reports:coverage/opencover.xml" \
   "-reporttypes:Html;HtmlSummary" \
-  "-targetdir:coverage/report"
+  "-targetdir:coverage/report" \
 
 ls
