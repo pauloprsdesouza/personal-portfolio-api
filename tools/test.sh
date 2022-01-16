@@ -20,7 +20,7 @@ dotnet test \
 
 dotnet tool install --tool-path tools dotnet-reportgenerator-globaltool
 
-./tools/reportgenerator \
-  "-reports:$solution_dir/test_project_dir/coverage/opencover.xml" \
+reportgenerator \
+  "-reports:coverage/opencover.xml" \
   "-reporttypes:Html;HtmlSummary" \
-  "-targetdir:$solution_dir/test_project_dir/coverage/report"
+  "-targetdir:coverage/report"
