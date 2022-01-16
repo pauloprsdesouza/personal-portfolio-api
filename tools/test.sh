@@ -17,6 +17,6 @@ dotnet new tool-manifest
 dotnet tool install --local dotnet-reportgenerator-globaltool
 
 dotnet reportgenerator \
-  "-reports:coverage/opencover.xml" \
+  "-reports:coverage.opencover.xml" \
   "-reporttypes:Html;HtmlSummary" \
-  "-targetdir:coverage/report"
+  "-targetdir:coveragereport"
