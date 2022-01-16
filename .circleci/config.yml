@@ -34,7 +34,7 @@ jobs:
                   /p:AltCoverThreshold="80"
                   /p:AltCoverOpenCover="true"
                   /p:AltCoverXmlReport="coverage/opencover.xml"
-                  /p:AltCoverInputDirectory=<< parameters.api_base_dir >>
+                  /p:AltCoverInputDirectory="<< parameters.api_base_dir >>"
                   /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage"
                   /p:AltCoverAssemblyExcludeFilter="System(.*)|xunit|<< parameters.api_tests_dir >>|<< parameters.api_base_dir >>.Views"
 
