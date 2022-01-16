@@ -3,6 +3,7 @@
 This REST Api is the Backed for [personal-porftfolio](https://github.com/pauloprsdesouza/personal-portfolio) frontend.
 
 [![CircleCI](https://img.shields.io/circleci/build/gh/pauloprsdesouza/personal-portfolio-api)](https://circleci.com/gh/pauloprsdesouza/personal-portfolio-api)
+[![codecov](https://codecov.io/gh/pauloprsdesouza/personal-portfolio-api/branch/main/graph/badge.svg?token=tNmF6vTEkJ)](https://codecov.io/gh/pauloprsdesouza/personal-portfolio-api)
 
 ## Used Stacks 
 
