@@ -41,9 +41,9 @@ jobs:
       - run: sudo chmod +x ./tools/test.sh
       - run: ./tools/test.sh
       - codecov:
-          file: << parameters.api_tests_dir >>/coverage/coverage.opencover.xml
+          file: << parameters.api_tests_dir >>/coverage/opencover.xml
       - store_artifacts:
-          path: << parameters.api_tests_dir >>/coverage-report/summary.htm
+          path: << parameters.api_tests_dir >>/coverage/report/summary.htm
           destination: << parameters.api_base_dir >>/coverage-report.htm
 
 workflows:
