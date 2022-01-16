@@ -18,10 +18,6 @@ dotnet test \
   /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage" \
   /p:AltCoverAssemblyExcludeFilter="System(.*)|xunit|$test_project_dir|$api_project_dir.Views"
 
-dotnet tool install --global dotnet-reportgenerator-globaltool
-
-export PATH="$PATH:/home/circleci/.dotnet/tools"
-
 reportgenerator \
   "-reports:coverage/opencover.xml" \
   "-reporttypes:Html;HtmlSummary" \
