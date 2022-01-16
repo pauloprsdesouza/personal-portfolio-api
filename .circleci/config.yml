@@ -36,7 +36,7 @@ jobs:
           working_directory: << parameters.api_base_dir >>
       - codecov/upload:
           token: CODECOV_TOKEN
-          file: << parameters.api_tests_dir >>
+          file: << parameters.api_tests_dir >>/coverage/opencover.xml
 
 workflows:
   version: 2.1
