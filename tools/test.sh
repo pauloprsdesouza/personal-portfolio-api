@@ -10,13 +10,13 @@ test_project_dir="Portfolio.Tests"
 cd $solution_dir/$test_project_dir
 
 dotnet test \
-  /p:CollectCoverage="true" \
-  /p:CoverletOutputFormat="opencover"
+  --collect:"XPlat Code Coverage"  \
+  --results-directory:"coverage" \
 
 dotnet new tool-manifest
 dotnet tool install --local dotnet-reportgenerator-globaltool
 
 dotnet reportgenerator \
-  "-reports:coverage/coverage.opencover.xml" \
+  "-reports:coverage/**/*.opencover.xml" \
   "-reporttypes:Html" \
-  "-targetdir:coveragereport"
+  "-targetdir:coverage-report/"
