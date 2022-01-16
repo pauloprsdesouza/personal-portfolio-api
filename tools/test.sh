@@ -20,6 +20,8 @@ dotnet test \
 
 dotnet tool install --global dotnet-reportgenerator-globaltool
 
+export PATH="$PATH:/home/circleci/.dotnet/tools"
+
 reportgenerator \
   "-reports:coverage/opencover.xml" \
   "-reporttypes:Html;HtmlSummary" \
