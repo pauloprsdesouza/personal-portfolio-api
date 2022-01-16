@@ -18,16 +18,7 @@ dotnet test \
   /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage" \
   /p:AltCoverAssemblyExcludeFilter="System(.*)|xunit|$test_project_dir|$api_project_dir.Views"
 
-dotnet tool install -g dotnet-reportgenerator-globaltool
-
-cat << \EOF >> ~/.bash_profile
-# Add .NET Core SDK tools
-export PATH="$PATH:/home/circleci/.dotnet/tools"
-EOF
-
-export PATH="$PATH:/home/circleci/.dotnet/tools"
-
-reportgenerator \
+dotnet reportgenerator \
   "-reports:coverage/opencover.xml" \
   "-reporttypes:Html;HtmlSummary" \
   "-targetdir:coverage/report"
