@@ -9,12 +9,12 @@ using System.Text;
 
 namespace Portfolio.Tests.Functional.Posts
 {
-    public class ListPostsTest
+    public class CreatePostTest
     {
         private readonly FakeApiServer _server;
         private readonly FakeApiClient _client;
 
-        public ListPostsTest()
+        public CreatePostTest()
         {
             _server = new FakeApiServer();
             _client = new FakeApiClient(_server);
