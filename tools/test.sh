@@ -13,10 +13,7 @@ dotnet test \
   /p:AltCover="true" \
   /p:AltCoverForce="true" \
   /p:AltCoverOpenCover="true" \
-  /p:AltCoverXmlReport="coverage/opencover.xml" \
-  /p:AltCoverInputDirectory="$api_project_dir" \
-  /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage" \
-  /p:AltCoverAssemblyExcludeFilter="System(.*)|xunit|$test_project_dir|$api_project_dir.Views"
+  /p:AltCoverXmlReport="coverage/opencover.xml"
 
 dotnet new tool-manifest
 dotnet tool install --local dotnet-reportgenerator-globaltool
