@@ -20,6 +20,13 @@ dotnet test \
 
 dotnet tool install -g dotnet-reportgenerator-globaltool
 
+cat << \EOF >> ~/.bash_profile
+# Add .NET Core SDK tools
+export PATH="$PATH:/home/circleci/.dotnet/tools"
+EOF
+
+export PATH="$PATH:/home/circleci/.dotnet/tools"
+
 reportgenerator \
   "-reports:coverage/opencover.xml" \
   "-reporttypes:Html;HtmlSummary" \
