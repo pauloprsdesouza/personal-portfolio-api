@@ -10,10 +10,8 @@ test_project_dir="Portfolio.Tests"
 cd $solution_dir/$test_project_dir
 
 dotnet test \
-  /p:AltCover="true" \
-  /p:AltCoverForce="true" \
-  /p:AltCoverOpenCover="true" \
-  /p:AltCoverXmlReport="coverage/opencover.xml"
+  /p:CollectCoverage="true" \
+  /p:CoverletOutputFormat="opencover"
 
 dotnet new tool-manifest
 dotnet tool install --local dotnet-reportgenerator-globaltool
