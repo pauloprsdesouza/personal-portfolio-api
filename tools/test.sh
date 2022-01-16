@@ -18,7 +18,7 @@ dotnet test \
   /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage" \
   /p:AltCoverAssemblyExcludeFilter="System(.*)|xunit|$test_project_dir|$api_project_dir.Views"
 
-dotnet add package dotnet-reportgenerator-cli --version 4.6.7
+dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.0.2
 
 dotnet reportgenerator \
   "-reports:coverage/opencover.xml" \
