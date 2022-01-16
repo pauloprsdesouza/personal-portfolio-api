@@ -39,10 +39,10 @@ jobs:
 
                   dotnet tool install -g dotnet-reportgenerator-globaltool
 
-                  dotnet reportgenerator
-                  "-reports:<< parameters.api_tests_dir >>/coverage/opencover.xml"
-                  "-reporttypes:Html;HtmlSummary"
-                  "-targetdir:<< parameters.api_tests_dir >>/coverage/report"
+                  reportgenerator
+                  -reports:"<< parameters.api_tests_dir >>/coverage/opencover.xml"
+                  -targetdir:"coveragereport"
+                  -reporttypes:Html
           working_directory: << parameters.api_tests_dir >>
       - run:
           name: Run Build
