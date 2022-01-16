@@ -33,14 +33,14 @@ jobs:
                   /p:AltCoverForce="true"
                   /p:AltCoverOpenCover="true"
                   /p:AltCoverXmlReport="coverage/opencover.xml"
-                  /p:AltCoverInputDirectory="<< parameters.api_tests_dir >>"
+                  /p:AltCoverInputDirectory="<< parameters.api_base_dir >>"
                   /p:AltCoverAttributeFilter="ExcludeFromCodeCoverage"
                   /p:AltCoverAssemblyExcludeFilter="System(.*)|xunit|<< parameters.api_tests_dir >>|<< parameters.api_base_dir >>.Views"
 
                   dotnet reportgenerator
-                  "-reports:coverage/opencover.xml"
+                  "-reports:<< parameters.api_tests_dir >>/coverage/opencover.xml"
                   "-reporttypes:Html;HtmlSummary"
-                  "-targetdir:coverage/report"
+                  "-targetdir:<< parameters.api_tests_dir >>/coverage/report"
           working_directory: << parameters.api_tests_dir >>
       - run:
           name: Run Build
