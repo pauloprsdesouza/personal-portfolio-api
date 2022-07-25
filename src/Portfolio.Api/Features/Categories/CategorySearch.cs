@@ -1,30 +1,28 @@
-using System;
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2.DataModel;
-using NUlid;
-using Portfolio.Api.Infrastructure.Database.DataModel.Categories;
-using System.Linq;
+using Portfolio.Domain.Categories;
 
 namespace Portfolio.Api.Features.Categories
 {
     public class CategorySearch
     {
-        public readonly IDynamoDBContext _dbContext;
+        public readonly ICategoryRepository _categoryRepository;
 
-        public CategorySearch(IDynamoDBContext dbContext)
+        public CategorySearch(ICategoryRepository categoryRepository)
         {
-            _dbContext = dbContext;
+            _categoryRepository = categoryRepository;
         }
 
         public bool CategoryNotFound { get; private set; }
 
-        public async Task<Category> Find(string categoryId)
+        public async Task<Category> Find(int categoryId)
         {
-            var categoryKey = new CategoryKey(String.Empty);
+            var category = await _categoryRepository.FindById(categoryId);
 
-            var category = await _dbContext.LoadAsync<Category>(categoryKey.PK, categoryKey.SK);
-
-            CategoryNotFound = category == null;
+            if (category == null)
+            {
+                CategoryNotFound = true;
+                return null;
+            }
 
             return category;
         }

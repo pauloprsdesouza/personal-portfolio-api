@@ -1,24 +1,39 @@
 using System;
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2.DataModel;
-using Portfolio.Api.Infrastructure.Database.DataModel.Categories;
+using Portfolio.Api.Models.Categories;
+using Portfolio.Domain.Categories;
 
 namespace Portfolio.Api.Features.Categories
 {
     public class CategoryUpdate
     {
-        private readonly IDynamoDBContext _dbContext;
+        public readonly ICategoryRepository _categoryRepository;
 
-        public CategoryUpdate(IDynamoDBContext dbContext)
+        public CategoryUpdate(ICategoryRepository categoryRepository)
         {
-            _dbContext = dbContext;
+            _categoryRepository = categoryRepository;
         }
 
-        public async Task Update(Category category)
+        public bool CategoryNotFound { get; private set; }
+
+        public async Task<Category> Update(int categoryId, PutCategoryRequest categoryRequest)
         {
+            var categorySearch = new CategorySearch(_categoryRepository);
+            var category = await categorySearch.Find(categoryId);
+
+            if (categorySearch.CategoryNotFound)
+            {
+                CategoryNotFound = true;
+                return null;
+            }
+
+            categoryRequest.MapTo(category);
+
             category.UpdatedAt = DateTimeOffset.UtcNow;
 
-            await _dbContext.SaveAsync(category);
+            await _categoryRepository.Update(category);
+
+            return category;
         }
     }
 }

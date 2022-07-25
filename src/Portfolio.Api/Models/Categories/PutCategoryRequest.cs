@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Portfolio.Api.Infrastructure.Database.DataModel.Categories;
+using Portfolio.Domain.Categories;
 
 namespace Portfolio.Api.Models.Categories
 {

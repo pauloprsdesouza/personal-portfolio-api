@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Portfolio.Api.Infrastructure.Database.DataModel.Users;
+using Portfolio.Domain.Users;
 
 namespace Portfolio.Api.Authorization
 {

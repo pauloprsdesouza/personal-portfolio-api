@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Portfolio.Api.Infrastructure.Database.DataModel.Subscribers;
+using Portfolio.Domain.Subscribers;
 
 namespace Portfolio.Api.Models.Subscribers
 {

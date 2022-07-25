@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Portfolio.Api.Features.Posts;
-using Portfolio.Api.Infrastructure.Database.DataModel.Posts;
+using Portfolio.Domain.Posts;
 
 namespace Portfolio.Api.Models.Posts
 {
@@ -22,13 +21,13 @@ namespace Portfolio.Api.Models.Posts
         /// Post's category id
         /// </summary>
         [Required]
-        public string CategoryId { get; set; }
+        public int CategoryId { get; set; }
 
         /// <summary>
         /// Post's front image URL
         /// </summary>
         [Required]
-        public string Status { get; set; }
+        public PostStatusEnum Status { get; set; }
 
         /// <summary>
         /// Post's reading time
@@ -40,7 +39,7 @@ namespace Portfolio.Api.Models.Posts
         /// Post's reading time
         /// </summary>
         [Required]
-        public string ReadingTime { get; set; }
+        public int ReadingTime { get; set; }
 
         /// <summary>
         /// Post's content that will be read by a user

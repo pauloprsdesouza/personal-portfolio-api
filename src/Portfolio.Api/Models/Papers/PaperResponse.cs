@@ -4,40 +4,23 @@ namespace Portfolio.Api.Models.Papers
 {
     public class PaperResponse
     {
-        /// <summary>
-        /// Paper's ID.
-        /// </summary>
-        public string Id { get; set; }
+         public string Title { get; set; }
 
-        /// <summary>
-        /// Paper's title.
-        /// </summary>
-        public string Title { get; set; }
+        public string Abstract { get; set; }
 
-        /// <summary>
-        /// Paper's submission deadline.
-        /// </summary>
-        public string SubmissionDeadline { get; set; }
+        public string Publisher { get; set; }
 
-        /// <summary>
-        /// Paper's type, where it can be J = Journal and C = Conference.
-        /// </summary>
+        public int Year { get; set; }
+
+        public int Volume { get; set; }
+
+        public int Page { get; set; }
+
         public string Type { get; set; }
 
-        /// <summary>
-        /// Paper's place, where is a place that will happen the event if it was a conference type.
-        /// </summary>
-        public string Place { get; set; }
-
-        /// <summary>
-        /// Paper's qualis. Here, it will be used the Brazilian's Qualis.
-        /// </summary>
         public string Qualis { get; set; }
 
-        /// <summary>
-        /// Paper's website URL of the event.
-        /// </summary>
-        public string WebsiteUrl { get; set; }
+        public string UrlPublication { get; set; }
 
         /// <summary>
         /// When paper was updated.

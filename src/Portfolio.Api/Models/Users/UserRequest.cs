@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Portfolio.Api.Infrastructure.Database.DataModel.Users;
+using Portfolio.Domain.Users;
 
 namespace Portfolio.Api.Models.Users
 {

@@ -1,26 +1,24 @@
 using System.Net.Mime;
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2.DataModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NUlid;
-using Portfolio.Api.Infrastructure.Database.DataModel.Categories;
 using Portfolio.Api.Models.Categories;
 using System.Linq;
-using Portfolio.Api.Infrastructure.Serialization.Categories;
 using Portfolio.Api.Features.Categories;
 using Microsoft.AspNetCore.Authorization;
+using Portfolio.Api.Models;
+using Portfolio.Domain.Categories;
 
 namespace Portfolio.Api.Controllers
 {
-    [Route("Categories")]
+    [Route("api/v1/categories")]
     public class CategoriesController : Controller
     {
-        private readonly IDynamoDBContext _dbContext;
+        private readonly ICategoryRepository _categoryRepository;
 
-        public CategoriesController(IDynamoDBContext dBContext)
+        public CategoriesController(ICategoryRepository categoryRepository)
         {
-            _dbContext = dBContext;
+            _categoryRepository = categoryRepository;
         }
 
         /// <summary>
@@ -34,16 +32,7 @@ namespace Portfolio.Api.Controllers
         [ProducesResponseType(typeof(GetCategoryResponse), StatusCodes.Status200OK)]
         public async Task<ActionResult> List([FromQuery] GetCategoriesQuery queryString)
         {
-            var query = new CategoryQuery();
-
-            var categories = await _dbContext
-                .FromQueryAsync<Category>(query.ToDynamoDBQuery())
-                .GetRemainingAsync();
-
-            return Ok(new GetCategoryResponse
-            {
-                Categories = categories.Select(category => category.MapToResponse())
-            });
+            return Ok();
         }
 
         /// <summary>
@@ -57,7 +46,7 @@ namespace Portfolio.Api.Controllers
         [ProducesResponseType(typeof(CategoryResponse), StatusCodes.Status200OK)]
         public async Task<ActionResult> Create([FromBody] CategoryRequest categoryRequest)
         {
-            var createCategory = new CreateCategory(_dbContext);
+            var createCategory = new CategoryRegistration(_categoryRepository);
             var category = categoryRequest.ToCategory();
 
             await createCategory.Register(category);
@@ -66,31 +55,24 @@ namespace Portfolio.Api.Controllers
         }
 
         /// <summary>
-        /// Update a category
+        ///
         /// </summary>
-        /// <remarks>
-        /// Update a category assigned to a post.
-        /// </remarks>
-        /// <param name="categoryId" example="01FME0F949HAVJ91A9100N16ZS">Category's ID</param>
-        /// <param name="putCategoryRequest">Category's content</param>
+        /// <param name="categoryId"></param>
+        /// <param name="categoryRequest"></param>
+        /// <returns></returns>
         [HttpPut, Route("{categoryId}")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(CategoryResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(CategoryNotFoundError), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> Update([FromRoute] Ulid categoryId, [FromBody] PutCategoryRequest putCategoryRequest)
+        [ProducesResponseType(typeof(ResponseError), StatusCodes.Status422UnprocessableEntity)]
+        public async Task<ActionResult> Update([FromRoute] int categoryId, [FromBody] PutCategoryRequest categoryRequest)
         {
-            var categorySearch = new CategorySearch(_dbContext);
-            var category = await categorySearch.Find(categoryId.ToString());
+            var categoryUpdate = new CategoryUpdate(_categoryRepository);
+            var category = await categoryUpdate.Update(categoryId, categoryRequest);
 
-            if (categorySearch.CategoryNotFound)
+            if (categoryUpdate.CategoryNotFound)
             {
-                return NotFound(new CategoryNotFoundError(categoryId.ToString()));
+                return UnprocessableEntity(new ResponseError("CATEGORY_NOT_FOUND"));
             }
-
-            putCategoryRequest.MapTo(category);
-
-            var categoryUpdate = new CategoryUpdate(_dbContext);
-            await categoryUpdate.Update(category);
 
             return Ok(category.MapToResponse());
         }
@@ -105,15 +87,15 @@ namespace Portfolio.Api.Controllers
         [HttpGet, Route("{categoryId}")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(CategoryResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(CategoryNotFoundError), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> Find([FromRoute] Ulid categoryId)
+        [ProducesResponseType(typeof(ResponseError), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> Find([FromRoute] int categoryId)
         {
-            var categorySearch = new CategorySearch(_dbContext);
-            var category = await categorySearch.Find(categoryId.ToString());
+            var categorySearch = new CategorySearch(_categoryRepository);
+            var category = await categorySearch.Find(categoryId);
 
             if (categorySearch.CategoryNotFound)
             {
-                return NotFound(new CategoryNotFoundError(categoryId.ToString()));
+                return NotFound(new ResponseError("CATEGORY_NOT_FOUND"));
             }
 
             return Ok(category.MapToResponse());
@@ -129,19 +111,16 @@ namespace Portfolio.Api.Controllers
         [HttpDelete, Route("{categoryId}")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(CategoryResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(CategoryNotFoundError), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> Delete([FromRoute] Ulid categoryId)
+        [ProducesResponseType(typeof(ResponseError), StatusCodes.Status422UnprocessableEntity)]
+        public async Task<ActionResult> Delete([FromRoute] int categoryId)
         {
-            var categorySearch = new CategorySearch(_dbContext);
-            var category = await categorySearch.Find(categoryId.ToString());
+            var categoryRemoval = new CategoryRemoval(_categoryRepository);
+            var category = await categoryRemoval.Delete(categoryId);
 
-            if (categorySearch.CategoryNotFound)
+            if (categoryRemoval.CategoryNotFound)
             {
-                return NotFound(new CategoryNotFoundError(categoryId.ToString()));
+                return UnprocessableEntity(new ResponseError("CATEGORY_NOT_FOUND"));
             }
-
-            var categoryDelete = new DeleteCategory(_dbContext);
-            await categoryDelete.Delete(category);
 
             return Ok(category.MapToResponse());
         }

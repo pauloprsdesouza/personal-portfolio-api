@@ -1,24 +1,39 @@
 using System;
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2.DataModel;
-using Portfolio.Api.Infrastructure.Database.DataModel.Posts;
+using Portfolio.Api.Models.Posts;
+using Portfolio.Domain.Posts;
 
 namespace Portfolio.Api.Features.Posts
 {
     public class PostUpdate
     {
-        private readonly IDynamoDBContext _dbContext;
+        private readonly IPostRepository _postRepository;
 
-        public PostUpdate(IDynamoDBContext dbContext)
+        public PostUpdate(IPostRepository postRepository)
         {
-            _dbContext = dbContext;
+            _postRepository = postRepository;
         }
 
-        public async Task Update(Post post)
+        public bool PostNotFound { get; private set; }
+
+        public async Task<Post> Update(int postId, PutPostRequest postRequest)
         {
+            var postSearch = new PostSearch(_postRepository);
+            var post = await postSearch.Find(postId);
+
+            if (postSearch.PostNotFound)
+            {
+                PostNotFound = true;
+                return null;
+            }
+
+            postRequest.MapTo(post);
+
             post.UpdatedAt = DateTimeOffset.UtcNow;
 
-            await _dbContext.SaveAsync(post);
+            await _postRepository.Update(post);
+
+            return post;
         }
     }
 }

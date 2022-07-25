@@ -1,27 +1,28 @@
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2.DataModel;
-using Portfolio.Api.Infrastructure.Database.DataModel.Subscribers;
+using Portfolio.Domain.Subscribers;
 
 namespace Portfolio.Api.Features.Subscribers
 {
     public class SubscriberSearch
     {
-         public readonly IDynamoDBContext _dbContext;
+        private readonly ISubscriberRepository _subscriberRepository;
 
-        public SubscriberSearch(IDynamoDBContext dbContext)
+        public SubscriberSearch(ISubscriberRepository subscriberRepository)
         {
-            _dbContext = dbContext;
+            _subscriberRepository = subscriberRepository;
         }
 
         public bool SubscriberNotFound { get; private set; }
 
-        public async Task<Subscriber> Find(string subscriberId)
+        public async Task<Subscriber> Find(int subscriberId)
         {
-            var subscriberKey = new SubscriberKey(subscriberId);
+            var subscriber = await _subscriberRepository.FindById(subscriberId);
 
-            var subscriber =  await _dbContext.LoadAsync<Subscriber>(subscriberKey.PK, subscriberKey.SK);
-
-            SubscriberNotFound = subscriber == null;
+            if (subscriber == null)
+            {
+                SubscriberNotFound = true;
+                return null;
+            }
 
             return subscriber;
         }

@@ -1,36 +1,38 @@
-using System.ComponentModel.DataAnnotations;
-using Portfolio.Api.Infrastructure.Database.DataModel.Papers;
+using Portfolio.Domain.Papers;
 
 namespace Portfolio.Api.Models.Papers
 {
     public class PutPaperRequest
     {
-        [Required, MaxLength(200)]
         public string Title { get; set; }
 
-        [Required]
-        public string SubmissionDeadline { get; set; }
+        public string Abstract { get; set; }
 
-        [Required]
+        public string Publisher { get; set; }
+
+        public int Year { get; set; }
+
+        public int Volume { get; set; }
+
+        public int Page { get; set; }
+
         public string Type { get; set; }
 
-        [Required, MaxLength(150)]
-        public string Place { get; set; }
-
-        [Required]
         public string Qualis { get; set; }
 
-        [Required]
-        public string WebsiteUrl { get; set; }
+        public string UrlPublication { get; set; }
 
         public void MapTo(Paper paper)
         {
             paper.Title = Title;
-            paper.SubmissionDeadline = SubmissionDeadline;
+            paper.Abstract = Abstract;
+            paper.Publisher = Publisher;
+            paper.Year = Year;
+            paper.Volume = Volume;
+            paper.Page = Page;
             paper.Type = Type;
-            paper.Place = Place;
             paper.Qualis = Qualis;
-            paper.WebsiteUrl = WebsiteUrl;
+            paper.UrlPublication = UrlPublication;
         }
     }
 }

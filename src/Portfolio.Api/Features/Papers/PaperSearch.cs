@@ -1,27 +1,28 @@
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.DataModel;
-using Portfolio.Api.Infrastructure.Database.DataModel.Papers;
+using Portfolio.Domain.Papers;
 
 namespace Portfolio.Api.Features.Papers
 {
     public class PaperSearch
     {
-        public readonly IDynamoDBContext _dbContext;
+         private readonly IPaperRepository _paperRepository;
 
-        public PaperSearch(IDynamoDBContext dbContext)
+        public PaperSearch(IPaperRepository paperRepository)
         {
-            _dbContext = dbContext;
+            _paperRepository = paperRepository;
         }
 
         public bool PaperNotFound { get; private set; }
 
-        public async Task<Paper> Find(string id)
+        public async Task<Paper> Find(int paperId)
         {
-            var paperKey = new PaperKey(id);
+            var paper = await _paperRepository.FindById(paperId);
 
-            var paper = await _dbContext.LoadAsync<Paper>(paperKey.PK, paperKey.SK);
-
-            PaperNotFound = paper == null;
+            if(paper == null) {
+                PaperNotFound = true;
+                return null;
+            }
 
             return paper;
         }

@@ -3,10 +3,8 @@ using System.Threading.Tasks;
 using Amazon.DynamoDBv2.DataModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Portfolio.Api.Infrastructure.Database.DataModel.Subscribers;
 using Portfolio.Api.Models.Subscribers;
 using System.Linq;
-using Portfolio.Api.Infrastructure.Serialization.Subscribers;
 using Portfolio.Api.Features.Subscribers;
 using NUlid;
 using Microsoft.AspNetCore.Authorization;
@@ -14,7 +12,7 @@ using Portfolio.Api.Features.Messages;
 
 namespace Portfolio.Api.Controllers
 {
-    [Route("Subscribers")]
+    [Route("api/v1/subscribers")]
     public class SubscribersController : Controller
     {
         private readonly IDynamoDBContext _dbContext;
@@ -119,7 +117,7 @@ namespace Portfolio.Api.Controllers
                 return NotFound(new SubscriberNotFoundError(subscriberId.ToString()));
             }
 
-            var subscriberDelete = new DeleteSubscriber(_dbContext);
+            var subscriberDelete = new SubscriberRemoval(_dbContext);
             await subscriberDelete.Delete(subscriber);
 
             return Ok(subscriber.MapToResponse());

@@ -1,31 +1,23 @@
 using System.Net.Mime;
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2.DataModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NUlid;
-using Portfolio.Api.Infrastructure.Database.DataModel.Posts;
 using Portfolio.Api.Models.Posts;
-using System.Linq;
-using Portfolio.Api.Infrastructure.Serialization.Posts;
 using Portfolio.Api.Features.Posts;
-using Portfolio.Api.Infrastructure.Serialization.Users;
-using Portfolio.Api.Features.Users;
-using Portfolio.Api.Infrastructure.Database.DataModel.Categories;
-using System.Collections.Generic;
-using Portfolio.Api.Infrastructure.Serialization.Categories;
 using Microsoft.AspNetCore.Authorization;
+using Portfolio.Domain.Posts;
+using Portfolio.Api.Models;
 
 namespace Portfolio.Api.Controllers
 {
-    [Route("Posts")]
+    [Route("api/v1/posts")]
     public class PostsController : Controller
     {
-        private readonly IDynamoDBContext _dbContext;
+        private readonly IPostRepository _postRepository;
 
-        public PostsController(IDynamoDBContext dbContext)
+        public PostsController(IPostRepository postRepository)
         {
-            _dbContext = dbContext;
+            _postRepository = postRepository;
         }
 
         const string UserId = "01FPSM8KW4ZPRS2K7JJHM3WSJZ";
@@ -42,31 +34,7 @@ namespace Portfolio.Api.Controllers
         [ProducesResponseType(typeof(GetPostResponse), StatusCodes.Status200OK)]
         public async Task<ActionResult> ListPublished([FromQuery] GetPostsQuery queryString)
         {
-            var query = new PostQuery();
-            query.BeforePost = queryString.Before ?? Ulid.NewUlid();
-            query.Status = "P";
-            query.Title = queryString.Title;
-            query.Length = queryString.Length ?? 30;
-            query.CategoryId = queryString.CategoryId;
-
-            var userSearch = new UserSearch(_dbContext);
-            var user = await userSearch.Find(UserEmail);
-
-            var posts = await _dbContext
-                .FromQueryAsync<Post>(query.ToDynamoDBQuery())
-                .GetRemainingAsync();
-
-            IEnumerable<PostResponse> postsResponse = posts.Select(post => post.MapToResponse()).ToList();
-
-            foreach (var post in postsResponse)
-            {
-                post.PostedBy = user.MapToResponse();
-            };
-
-            return Ok(new GetPostResponse
-            {
-                Posts = postsResponse
-            });
+            return Ok();
         }
 
         /// <summary>
@@ -80,30 +48,7 @@ namespace Portfolio.Api.Controllers
         [ProducesResponseType(typeof(GetPostResponse), StatusCodes.Status200OK)]
         public async Task<ActionResult> List([FromQuery] GetPostsQuery queryString)
         {
-            var query = new PostQuery();
-            query.BeforePost = queryString.Before ?? Ulid.NewUlid();
-            query.Status = queryString.Status;
-            query.Length = queryString.Length ?? 30;
-            query.CategoryId = queryString.CategoryId;
-
-            var userSearch = new UserSearch(_dbContext);
-            var user = await userSearch.Find(UserEmail);
-
-            var posts = await _dbContext
-                .FromQueryAsync<Post>(query.ToDynamoDBQuery())
-                .GetRemainingAsync();
-
-            IEnumerable<PostResponse> postsResponse = posts.Select(post => post.MapToResponse()).ToList();
-
-            foreach (var post in postsResponse)
-            {
-                post.PostedBy = user.MapToResponse();
-            };
-
-            return Ok(new GetPostResponse
-            {
-                Posts = postsResponse
-            });
+            return Ok();
         }
 
         /// <summary>
@@ -117,10 +62,10 @@ namespace Portfolio.Api.Controllers
         [ProducesResponseType(typeof(PostResponse), StatusCodes.Status200OK)]
         public async Task<ActionResult> Create([FromBody] PostRequest postRequest)
         {
-            var createPost = new CreatePost(_dbContext);
+            var createPost = new PostRegistration(_postRepository);
             var post = postRequest.ToPost();
 
-            await createPost.Register(UserId, UserEmail, post);
+            await createPost.Register(post);
 
             return Ok(post.MapToResponse());
         }
@@ -132,25 +77,20 @@ namespace Portfolio.Api.Controllers
         /// Update a post already registered.
         /// </remarks>
         /// <param name="postId" example="01FME0F949HAVJ91A9100N16ZS">Posts's ID</param>
-        /// <param name="putPostRequest">Posts's content</param>
+        /// <param name="postRequest">Posts's content</param>
         [HttpPut, Route("{postId}")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(PostResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(PostNotFoundError), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> Update([FromRoute] Ulid postId, [FromBody] PutPostRequest putPostRequest)
+        [ProducesResponseType(typeof(ResponseError), StatusCodes.Status422UnprocessableEntity)]
+        public async Task<ActionResult> Update([FromRoute] int postId, [FromBody] PutPostRequest postRequest)
         {
-            var postSearch = new PostSearch(_dbContext);
-            var post = await postSearch.Find(postId);
+            var postUpdate = new PostUpdate(_postRepository);
+            var post = await postUpdate.Update(postId, postRequest);
 
-            if (postSearch.PostNotFound)
+            if (postUpdate.PostNotFound)
             {
-                return NotFound(new PostNotFoundError(postId.ToString()));
+                return UnprocessableEntity(new ResponseError("POST_NOT_FOUND"));
             }
-
-            putPostRequest.MapTo(post);
-
-            var postUpdate = new PostUpdate(_dbContext);
-            await postUpdate.Update(post);
 
             return Ok(post.MapToResponse());
         }
@@ -165,22 +105,16 @@ namespace Portfolio.Api.Controllers
         [HttpPut, Route("views/{postId}"), AllowAnonymous]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(PostResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(PostNotFoundError), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> UpdateViews([FromRoute] Ulid postId)
+        [ProducesResponseType(typeof(ResponseError), StatusCodes.Status422UnprocessableEntity)]
+        public async Task<ActionResult> UpdateViews([FromRoute] int postId)
         {
-            var postSearch = new PostSearch(_dbContext);
-            var post = await postSearch.Find(postId);
+            var postUpdate = new PostViewsUpdate(_postRepository);
+            var post = await postUpdate.Update(postId);
 
-            if (postSearch.PostNotFound)
+            if (postUpdate.PostNotFound)
             {
-                return NotFound(new PostNotFoundError(postId.ToString()));
+                return UnprocessableEntity(new ResponseError("POST_NOT_FOUND"));
             }
-
-            var views = int.Parse(post.Views) + 1;
-            post.Views = views.ToString();
-
-            var postUpdate = new PostUpdate(_dbContext);
-            await postUpdate.Update(post);
 
             return Ok(post.MapToResponse());
         }
@@ -195,34 +129,18 @@ namespace Portfolio.Api.Controllers
         [HttpGet, Route("{postId}"), AllowAnonymous]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(PostResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(PostNotFoundError), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> Find([FromRoute] Ulid postId)
+        [ProducesResponseType(typeof(ResponseError), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> Find([FromRoute] int postId)
         {
-            var postSearch = new PostSearch(_dbContext);
+            var postSearch = new PostSearch(_postRepository);
             var post = await postSearch.Find(postId);
 
             if (postSearch.PostNotFound)
             {
-                return NotFound(new PostNotFoundError(postId.ToString()));
+                return NotFound(new ResponseError("POST_NOT_FOUND"));
             }
 
-            var userSearch = new UserSearch(_dbContext);
-            var user = await userSearch.Find(UserEmail);
-
-            var query = new CategoryQuery();
-
-            var categories = await _dbContext
-                .FromQueryAsync<Category>(query.ToDynamoDBQuery())
-                .GetRemainingAsync();
-
-            PostResponse postResponse = post.MapToResponse();
-            postResponse.PostedBy = user.MapToResponse();
-            postResponse.Category = categories
-                                        .Where(category => category.Id.ToString() == post.CategoryId)
-                                        .FirstOrDefault()
-                                        .MapToResponse();
-
-            return Ok(postResponse);
+            return Ok(post.MapToResponse());
         }
 
         /// <summary>
@@ -235,19 +153,16 @@ namespace Portfolio.Api.Controllers
         [HttpDelete, Route("{postId}")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(PostResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(PostNotFoundError), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> Delete([FromRoute] Ulid postId)
+        [ProducesResponseType(typeof(ResponseError), StatusCodes.Status422UnprocessableEntity)]
+        public async Task<ActionResult> Archivement([FromRoute] int postId)
         {
-            var postSearch = new PostSearch(_dbContext);
-            var post = await postSearch.Find(postId);
+            var postArchivement = new PostArchivement(_postRepository);
+            var post = await postArchivement.Delete(postId);
 
-            if (postSearch.PostNotFound)
+            if (postArchivement.PostNotFound)
             {
-                return NotFound(new PostNotFoundError(postId.ToString()));
+                return UnprocessableEntity(new ResponseError("POST_NOT_FOUND"));
             }
-
-            var postDelete = new DeletePost(_dbContext);
-            await postDelete.Delete(post);
 
             return Ok(post.MapToResponse());
         }

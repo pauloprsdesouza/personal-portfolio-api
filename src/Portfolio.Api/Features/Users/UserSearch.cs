@@ -1,27 +1,28 @@
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2.DataModel;
-using Portfolio.Api.Infrastructure.Database.DataModel.Users;
+using Portfolio.Domain.Users;
 
 namespace Portfolio.Api.Features.Users
 {
     public class UserSearch
     {
-        public readonly IDynamoDBContext _dbContext;
+        public readonly IUserRepository _userRepository;
 
-        public UserSearch(IDynamoDBContext dbContext)
+        public UserSearch(IUserRepository userRepository)
         {
-            _dbContext = dbContext;
+            _userRepository = userRepository;
         }
 
         public bool UserNotFound { get; private set; }
 
-        public async Task<User> Find(string email)
+        public async Task<User> Find(string userEmail)
         {
-            var userKey = new UserKey(email);
+            var user = await _userRepository.FindById(userId);
 
-            var user =  await _dbContext.LoadAsync<User>(userKey.PK, userKey.SK);
-
-            UserNotFound = user == null;
+            if (user == null)
+            {
+                UserNotFound = true;
+                return null;
+            }
 
             return user;
         }

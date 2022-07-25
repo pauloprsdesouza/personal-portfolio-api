@@ -1,24 +1,38 @@
 using System;
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2.DataModel;
-using Portfolio.Api.Infrastructure.Database.DataModel.Papers;
+using Portfolio.Api.Models.Papers;
+using Portfolio.Domain.Papers;
 
 namespace Portfolio.Api.Features.Papers
 {
     public class PaperUpdate
     {
-        private readonly IDynamoDBContext _dbContext;
+        private readonly IPaperRepository _paperRepository;
 
-        public PaperUpdate(IDynamoDBContext dbContext)
+        public PaperUpdate(IPaperRepository paperRepository)
         {
-            _dbContext = dbContext;
+            _paperRepository = paperRepository;
         }
 
-        public async Task Update(Paper paper)
+        public bool PaperNotFound { get; private set; }
+
+        public async Task<Paper> Update(int paperId, PutPaperRequest paperRequest)
         {
+            var paperSearch = new PaperSearch(_paperRepository);
+            var paper = await paperSearch.Find(paperId);
+
+            if (paperSearch.PaperNotFound)
+            {
+                PaperNotFound = true;
+                return null;
+            }
+
+            paperRequest.MapTo(paper);
             paper.UpdatedAt = DateTimeOffset.UtcNow;
 
-            await _dbContext.SaveAsync(paper);
+            await _paperRepository.Update(paper);
+
+            return paper;
         }
     }
 }

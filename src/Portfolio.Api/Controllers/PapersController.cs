@@ -1,26 +1,24 @@
 using System.Net.Mime;
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2.DataModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using Portfolio.Api.Models.Papers;
-using Portfolio.Api.Infrastructure.Database.DataModel.Papers;
-using Portfolio.Api.Infrastructure.Serialization.Papers;
 using Portfolio.Api.Features.Papers;
-using NUlid;
 using Microsoft.AspNetCore.Authorization;
+using Portfolio.Domain.Papers;
+using Portfolio.Api.Models;
 
 namespace Portfolio.Api.Controllers
 {
     [Route("Papers")]
     public class PapersController : Controller
     {
-        private readonly IDynamoDBContext _dbContext;
+        private readonly IPaperRepository _paperRepository;
 
-        public PapersController(IDynamoDBContext dBContext)
+        public PapersController(IPaperRepository paperRepository)
         {
-            _dbContext = dBContext;
+            _paperRepository = paperRepository;
         }
 
         /// <summary>
@@ -34,20 +32,7 @@ namespace Portfolio.Api.Controllers
         [ProducesResponseType(typeof(GetPaperResponse), StatusCodes.Status200OK)]
         public async Task<ActionResult> List([FromQuery] GetPapersQuery queryString)
         {
-            var query = new PaperQuery();
-            query.Title = queryString.Title;
-            query.SubmissionDeadline = queryString.SubmissionDeadline;
-            query.Qualis = queryString.Qualis;
-            query.Type = queryString.Type;
-
-            var papers = await _dbContext
-                .FromQueryAsync<Paper>(query.ToDynamoDBQuery())
-                .GetRemainingAsync();
-
-            return Ok(new GetPaperResponse
-            {
-                Papers = papers.Select(paper => paper.MapToResponse())
-            });
+            return Ok();
         }
 
         /// <summary>
@@ -61,10 +46,10 @@ namespace Portfolio.Api.Controllers
         [ProducesResponseType(typeof(PaperResponse), StatusCodes.Status200OK)]
         public async Task<ActionResult> Create([FromBody] PaperRequest paperRequest)
         {
-            var createPaper = new CreatePaper(_dbContext);
+            var paperRegistration = new PaperRegistration(_paperRepository);
             var paper = paperRequest.ToPaper();
 
-            await createPaper.Register(paper);
+            await paperRegistration.Register(paper);
 
             return Ok(paper.MapToResponse());
         }
@@ -76,25 +61,20 @@ namespace Portfolio.Api.Controllers
         /// Update a paper already registered.
         /// </remarks>
         /// <param name="paperId" example="01FME0F949HAVJ91A9100N16ZS">Paper's ID</param>
-        /// <param name="putPaperRequest">Paper's content</param>
+        /// <param name="paperRequest">Paper's content</param>
         [HttpPut, Route("{paperId}")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(PaperResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(PaperNotFoundError), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> Update([FromRoute] Ulid paperId, [FromBody] PutPaperRequest putPaperRequest)
+        [ProducesResponseType(typeof(ResponseError), StatusCodes.Status422UnprocessableEntity)]
+        public async Task<ActionResult> Update([FromRoute] int paperId, [FromBody] PutPaperRequest paperRequest)
         {
-            var paperSearch = new PaperSearch(_dbContext);
-            var paper = await paperSearch.Find(paperId.ToString());
+            var paperUpdate = new PaperUpdate(_paperRepository);
+            var paper = await paperUpdate.Update(paperId, paperRequest);
 
-            if (paperSearch.PaperNotFound)
+             if (paperUpdate.PaperNotFound)
             {
-                return NotFound(new PaperNotFoundError(paperId.ToString()));
+                return UnprocessableEntity(new ResponseError("PAPER_NOT_FOUND"));
             }
-
-            putPaperRequest.MapTo(paper);
-
-            var paperUpdate = new PaperUpdate(_dbContext);
-            await paperUpdate.Update(paper);
 
             return Ok(paper.MapToResponse());
         }
@@ -109,15 +89,15 @@ namespace Portfolio.Api.Controllers
         [HttpGet, Route("{paperId}")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(PaperResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(PaperNotFoundError), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> Find([FromRoute] Ulid paperId)
+        [ProducesResponseType(typeof(ResponseError), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> Find([FromRoute] int paperId)
         {
-            var paperSearch = new PaperSearch(_dbContext);
-            var paper = await paperSearch.Find(paperId.ToString());
+            var paperSearch = new PaperSearch(_paperRepository);
+            var paper = await paperSearch.Find(paperId);
 
             if (paperSearch.PaperNotFound)
             {
-                return NotFound(new PaperNotFoundError(paperId.ToString()));
+                return UnprocessableEntity(new ResponseError("PAPER_NOT_FOUND"));
             }
 
             return Ok(paper.MapToResponse());
@@ -133,19 +113,16 @@ namespace Portfolio.Api.Controllers
         [HttpDelete, Route("{paperId}")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(PaperResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(PaperNotFoundError), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> Delete([FromRoute] Ulid paperId)
+        [ProducesResponseType(typeof(ResponseError), StatusCodes.Status422UnprocessableEntity)]
+        public async Task<ActionResult> Delete([FromRoute] int paperId)
         {
-            var paperSearch = new PaperSearch(_dbContext);
-            var paper = await paperSearch.Find(paperId.ToString());
+            var paperRemoval = new PaperRemoval(_paperRepository);
+            var paper = await paperRemoval.Delete(paperId);
 
-            if (paperSearch.PaperNotFound)
+            if (paperRemoval.PaperNotFound)
             {
-                return NotFound(new PaperNotFoundError(paperId.ToString()));
+                return UnprocessableEntity(new ResponseError("PAPER_NOT_FOUND"));
             }
-
-            var paperDelete = new DeletePaper(_dbContext);
-            await paperDelete.Delete(paper);
 
             return Ok(paper.MapToResponse());
         }

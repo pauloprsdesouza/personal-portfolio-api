@@ -1,28 +1,28 @@
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2.DataModel;
-using Portfolio.Api.Infrastructure.Database.DataModel.Posts;
-using NUlid;
+using Portfolio.Domain.Posts;
 
 namespace Portfolio.Api.Features.Posts
 {
     public class PostSearch
     {
-        public readonly IDynamoDBContext _dbContext;
+        public readonly IPostRepository _postRepository;
 
-        public PostSearch(IDynamoDBContext dbContext)
+        public PostSearch(IPostRepository postRepository)
         {
-            _dbContext = dbContext;
+            _postRepository = postRepository;
         }
 
         public bool PostNotFound { get; private set; }
 
-        public async Task<Post> Find(Ulid postId)
+        public async Task<Post> Find(int postId)
         {
-            var postKey = new PostKey(postId);
+            var post = await _postRepository.FindById(postId);
 
-            var post =  await _dbContext.LoadAsync<Post>(postKey.PK, postKey.SK);
-
-            PostNotFound = post == null;
+            if (post == null)
+            {
+                PostNotFound = true;
+                return null;
+            }
 
             return post;
         }

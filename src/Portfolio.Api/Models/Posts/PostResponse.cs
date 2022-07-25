@@ -1,7 +1,7 @@
 using System;
-using Portfolio.Api.Infrastructure.Database.DataModel.Users;
 using Portfolio.Api.Models.Categories;
 using Portfolio.Api.Models.Users;
+using Portfolio.Domain.Posts;
 
 namespace Portfolio.Api.Models.Posts
 {
@@ -10,7 +10,7 @@ namespace Portfolio.Api.Models.Posts
         /// <summary>
         /// Post's ID
         /// </summary>
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Post's title
@@ -25,7 +25,7 @@ namespace Portfolio.Api.Models.Posts
         /// <summary>
         /// Post's status
         /// </summary>
-        public string Status { get; set; }
+        public PostStatusEnum Status { get; set; }
 
         /// <summary>
         /// Post's front image URL
@@ -35,7 +35,7 @@ namespace Portfolio.Api.Models.Posts
         /// <summary>
         /// Post's category
         /// </summary>
-        public CategoryResponse Category { get; set; }
+        public string Category { get; set; }
 
         /// <summary>
         /// Post's content
@@ -45,12 +45,12 @@ namespace Portfolio.Api.Models.Posts
         /// <summary>
         /// Post's reading time
         /// </summary>
-        public string ReadingTime { get; set; }
+        public int ReadingTime { get; set; }
 
         /// <summary>
         /// Post's views
         /// </summary>
-        public string Views { get; set; }
+        public int Views { get; set; }
 
         /// <summary>
         /// Post's user that updated a post

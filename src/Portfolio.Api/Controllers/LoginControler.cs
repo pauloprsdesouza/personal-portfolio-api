@@ -1,28 +1,27 @@
 using System.Net.Mime;
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2.DataModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Portfolio.Api.Authorization;
 using Portfolio.Api.Features.Users;
-using Portfolio.Api.Infrastructure.Database.DataModel.Users;
+using Portfolio.Api.Models;
 using Portfolio.Api.Models.Users;
-using Portfolio.Api.Infrastructure.Serialization.Users;
+using Portfolio.Domain.Users;
 
 namespace Portfolio.Api.Controllers
 {
-    [Route("Login")]
+    [Route("api/v1/login")]
     public class LoginControler : Controller
     {
-        private readonly IDynamoDBContext _dbContext;
+        private readonly IUserRepository _userRepository;
 
         private readonly IOptions<JwtOptions> _jwtOptions;
 
-        public LoginControler(IDynamoDBContext dbContext, IOptions<JwtOptions> jwtOptions)
+        public LoginControler(IUserRepository userRepository, IOptions<JwtOptions> jwtOptions)
         {
-            _dbContext = dbContext;
+            _userRepository = userRepository;
             _jwtOptions = jwtOptions;
         }
 
@@ -35,15 +34,16 @@ namespace Portfolio.Api.Controllers
         [HttpPut, AllowAnonymous]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(UserNotFoundError), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ResponseError), StatusCodes.Status422UnprocessableEntity)]
+        [ProducesResponseType(typeof(ResponseError), StatusCodes.Status403Forbidden)]
         public async Task<ActionResult> Login([FromBody] UserRequest userRequest)
         {
-            var userSearch = new UserSearch(_dbContext);
+            var userSearch = new UserSearch(_userRepository);
             var user = await userSearch.Find(userRequest.Email);
 
             if (userSearch.UserNotFound)
             {
-                return NotFound(new UserNotFoundError());
+                return UnprocessableEntity(new ResponseError("USER_NOT_FOUND"));
             }
 
             if (!BCrypt.Net.BCrypt.Verify(userRequest.Password, user.Password))
