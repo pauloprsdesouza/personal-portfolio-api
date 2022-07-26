@@ -9,6 +9,8 @@ using Amazon.DynamoDBv2.DataModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Portfolio.Api.Authorization;
+using Portfolio.Infrastructure.Database.Datamodel;
+using Microsoft.EntityFrameworkCore;
 
 namespace Portfolio.Api
 {
@@ -24,6 +26,14 @@ namespace Portfolio.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDefaultAWSOptions(_configuration.GetAWSOptions());
+
+            services.AddDbContext<ApiDbContext>(options =>
+            {
+                options.UseNpgsql("server=localhost;Port=5440;database=postgres;user id=postgres;password=mysecretpassword", pgsql =>
+                {
+                    pgsql.MigrationsHistoryTable(tableName: "__migration_history", schema: ApiDbContext.Schema);
+                });
+            });
 
             services.AddControllers(options =>
             {

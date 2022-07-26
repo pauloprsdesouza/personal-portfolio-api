@@ -11,7 +11,7 @@ using Portfolio.Api.Models;
 
 namespace Portfolio.Api.Controllers
 {
-    [Route("Papers")]
+    [Route("api/v1/papers")]
     public class PapersController : Controller
     {
         private readonly IPaperRepository _paperRepository;

@@ -14,10 +14,10 @@ namespace Portfolio.Api.Features.Subscribers
 
         public bool SubscriberNotFound { get; private set; }
 
-        public async Task<Subscriber> Delete(Subscriber subscriber)
+        public async Task<Subscriber> Delete(int subscriberId)
         {
             var subscriberSearch = new SubscriberSearch(_subscriberRepository);
-            var subscriberContext = await subscriberSearch.Find(subscriber.Id);
+            var subscriber = await subscriberSearch.Find(subscriberId);
 
             if (subscriberSearch.SubscriberNotFound)
             {

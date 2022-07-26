@@ -16,7 +16,7 @@ namespace Portfolio.Api.Features.Users
 
         public async Task<User> Find(string userEmail)
         {
-            var user = await _userRepository.FindById(userId);
+            var user = await _userRepository.FindByEmail(userEmail);
 
             if (user == null)
             {

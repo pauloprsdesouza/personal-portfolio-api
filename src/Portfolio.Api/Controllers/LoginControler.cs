@@ -12,7 +12,7 @@ using Portfolio.Domain.Users;
 
 namespace Portfolio.Api.Controllers
 {
-    [Route("api/v1/login")]
+    [Route("api/v1/users")]
     public class LoginControler : Controller
     {
         private readonly IUserRepository _userRepository;

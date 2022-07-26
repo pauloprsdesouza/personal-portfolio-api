@@ -8,7 +8,7 @@ using Portfolio.Api.Models.Contacts;
 
 namespace Portfolio.Api.Controllers
 {
-    [Route("Contacts")]
+    [Route("api/v1/contacts")]
     public class ContactsController : Controller
     {
         private readonly IDynamoDBContext _dbContext;

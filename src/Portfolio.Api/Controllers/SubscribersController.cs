@@ -1,25 +1,24 @@
 using System.Net.Mime;
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2.DataModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Portfolio.Api.Models.Subscribers;
-using System.Linq;
 using Portfolio.Api.Features.Subscribers;
-using NUlid;
 using Microsoft.AspNetCore.Authorization;
 using Portfolio.Api.Features.Messages;
+using Portfolio.Domain.Subscribers;
+using Portfolio.Api.Models;
 
 namespace Portfolio.Api.Controllers
 {
     [Route("api/v1/subscribers")]
     public class SubscribersController : Controller
     {
-        private readonly IDynamoDBContext _dbContext;
+        private readonly ISubscriberRepository _subscriberRepository;
 
-        public SubscribersController(IDynamoDBContext dbContext)
+        public SubscribersController(ISubscriberRepository subscriberRepository)
         {
-            _dbContext = dbContext;
+            _subscriberRepository = subscriberRepository;
         }
 
         /// <summary>
@@ -33,16 +32,7 @@ namespace Portfolio.Api.Controllers
         [ProducesResponseType(typeof(GetSubscriberResponse), StatusCodes.Status200OK)]
         public async Task<ActionResult> List([FromQuery] GetSubscribersQuery queryString)
         {
-            var query = new SubscriberQuery();
-
-            var subscribers = await _dbContext
-                .FromQueryAsync<Subscriber>(query.ToDynamoDBQuery())
-                .GetRemainingAsync();
-
-            return Ok(new GetSubscriberResponse
-            {
-                Subscribers = subscribers.Select(subscriber => subscriber.MapToResponse())
-            });
+            return Ok();
         }
 
         /// <summary>
@@ -56,10 +46,10 @@ namespace Portfolio.Api.Controllers
         [ProducesResponseType(typeof(SubscriberResponse), StatusCodes.Status200OK)]
         public async Task<ActionResult> Create([FromBody] SubscriberRequest subscriberRequest)
         {
-            var createSubscriber = new CreateSubscriber(_dbContext);
+            var subscriberRegistration = new SubscriberRegistration(_subscriberRepository);
             var subscriber = subscriberRequest.ToSubscriber();
 
-            await createSubscriber.Register(subscriber);
+            await subscriberRegistration.Register(subscriber);
 
             var message = new SendMessage();
             message.From = subscriberRequest.Email;
@@ -82,15 +72,15 @@ namespace Portfolio.Api.Controllers
         [HttpGet, Route("{subscriberId}")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(SubscriberResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(SubscriberNotFoundError), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> Find([FromRoute] Ulid subscriberId)
+        [ProducesResponseType(typeof(ResponseError), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> Find([FromRoute] int subscriberId)
         {
-            var subscriberSearch = new SubscriberSearch(_dbContext);
-            var subscriber = await subscriberSearch.Find(subscriberId.ToString());
+            var subscriberSearch = new SubscriberSearch(_subscriberRepository);
+            var subscriber = await subscriberSearch.Find(subscriberId);
 
             if (subscriberSearch.SubscriberNotFound)
             {
-                return NotFound(new SubscriberNotFoundError(subscriberId.ToString()));
+                return NotFound(new ResponseError("SUBSCRIBER_NOT_FOUND"));
             }
 
             return Ok(subscriber.MapToResponse());
@@ -106,19 +96,16 @@ namespace Portfolio.Api.Controllers
         [HttpDelete, Route("{subscriberId}"), AllowAnonymous]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(SubscriberResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(SubscriberNotFoundError), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> Delete([FromRoute] Ulid subscriberId)
+        [ProducesResponseType(typeof(ResponseError), StatusCodes.Status422UnprocessableEntity)]
+        public async Task<ActionResult> Delete([FromRoute] int subscriberId)
         {
-            var subscriberSearch = new SubscriberSearch(_dbContext);
-            var subscriber = await subscriberSearch.Find(subscriberId.ToString());
+            var subscriberRemoval = new SubscriberRemoval(_subscriberRepository);
+            var subscriber = await subscriberRemoval.Delete(subscriberId);
 
-            if (subscriberSearch.SubscriberNotFound)
+            if (subscriberRemoval.SubscriberNotFound)
             {
-                return NotFound(new SubscriberNotFoundError(subscriberId.ToString()));
+                return UnprocessableEntity(new ResponseError("SUBSCRIBER_NOT_FOUND"));
             }
-
-            var subscriberDelete = new SubscriberRemoval(_dbContext);
-            await subscriberDelete.Delete(subscriber);
 
             return Ok(subscriber.MapToResponse());
         }
