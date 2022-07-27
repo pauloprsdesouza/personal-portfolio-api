@@ -6,6 +6,7 @@ using Portfolio.Api.Models.Categories;
 using Portfolio.Api.Features.Categories;
 using Portfolio.Api.Models;
 using Portfolio.Domain.Categories;
+using System.Linq;
 
 namespace Portfolio.Api.Controllers
 {
@@ -17,6 +18,22 @@ namespace Portfolio.Api.Controllers
         public CategoriesController(ICategoryRepository categoryRepository)
         {
             _categoryRepository = categoryRepository;
+        }
+
+        /// <summary>
+        /// List all categories
+        /// </summary>
+        [HttpGet]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(GetCategoryResponse), StatusCodes.Status201Created)]
+        public async Task<ActionResult> List()
+        {
+            var categories = await _categoryRepository.FindAll();
+
+            return Ok(new GetCategoryResponse()
+            {
+                Categories = categories.Select(p => p.MapToResponse())
+            });
         }
 
         /// <summary>

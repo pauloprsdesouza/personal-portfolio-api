@@ -31,6 +31,11 @@ namespace Portfolio.Infrastructure.Database.Datamodel.Categories
             return category;
         }
 
+        public async Task<List<Category>> FindAll()
+        {
+            return await _categories.ToListAsync();
+        }
+
         public async Task<Category> FindById(int id)
         {
             return await _categories
