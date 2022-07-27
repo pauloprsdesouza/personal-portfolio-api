@@ -1,4 +1,5 @@
 using System;
+using Portfolio.Domain.Papers;
 
 namespace Portfolio.Api.Models.Papers
 {
@@ -16,9 +17,9 @@ namespace Portfolio.Api.Models.Papers
 
         public int Page { get; set; }
 
-        public string Type { get; set; }
+        public PaperType Type { get; set; }
 
-        public string Qualis { get; set; }
+        public QualisEnum Qualis { get; set; }
 
         public string UrlPublication { get; set; }
 

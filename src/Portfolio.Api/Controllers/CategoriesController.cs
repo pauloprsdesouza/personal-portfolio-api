@@ -3,9 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Portfolio.Api.Models.Categories;
-using System.Linq;
 using Portfolio.Api.Features.Categories;
-using Microsoft.AspNetCore.Authorization;
 using Portfolio.Api.Models;
 using Portfolio.Domain.Categories;
 
@@ -22,20 +20,6 @@ namespace Portfolio.Api.Controllers
         }
 
         /// <summary>
-        /// Get categories
-        /// </summary>
-        /// <remarks>
-        /// Categories that represent a post's topic.
-        /// </remarks>
-        [HttpGet, AllowAnonymous]
-        [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(GetCategoryResponse), StatusCodes.Status200OK)]
-        public async Task<ActionResult> List([FromQuery] GetCategoriesQuery queryString)
-        {
-            return Ok();
-        }
-
-        /// <summary>
         /// Create a category
         /// </summary>
         /// <remarks>
@@ -43,8 +27,8 @@ namespace Portfolio.Api.Controllers
         /// </remarks>
         [HttpPost]
         [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(CategoryResponse), StatusCodes.Status200OK)]
-        public async Task<ActionResult> Create([FromBody] CategoryRequest categoryRequest)
+        [ProducesResponseType(typeof(CategoryResponse), StatusCodes.Status201Created)]
+        public async Task<ActionResult> Create([FromBody] PostCategoryRequest categoryRequest)
         {
             var createCategory = new CategoryRegistration(_categoryRepository);
             var category = categoryRequest.ToCategory();

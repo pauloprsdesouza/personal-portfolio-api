@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Portfolio.Api.Authorization;
 using Portfolio.Infrastructure.Database.Datamodel;
 using Microsoft.EntityFrameworkCore;
+using Portfolio.Infrastructure.Dependencies;
 
 namespace Portfolio.Api
 {
@@ -41,7 +42,7 @@ namespace Portfolio.Api
                     .RequireAuthenticatedUser()
                     .Build();
 
-                options.Filters.Add(new AuthorizeFilter(policy));
+               // options.Filters.Add(new AuthorizeFilter(policy));
                 options.Filters.Add(typeof(ExceptionFilter));
                 options.Filters.Add(typeof(RequestValidationFilter));
             })
@@ -54,18 +55,20 @@ namespace Portfolio.Api
             services.AddScoped<IDynamoDBContext, DynamoDBContext>();
 
             services.AddDefaultCorsPolicy();
-            services.AddJwtAuthentication(_configuration.GetSection("JWT"));
+           // services.AddJwtAuthentication(_configuration.GetSection("JWT"));
+            services.RepositoriesConfigure();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseSwaggerDocumentation();
+            app.UseRedoclyDocumentation();
 
             app.UseRouting();
 
             app.UseCors();
-            app.UseAuthentication();
-            app.UseAuthorization();
+           // app.UseAuthentication();
+           // app.UseAuthorization();
 
             app.UseEndpoints(endpoints => endpoints.MapControllers());
         }

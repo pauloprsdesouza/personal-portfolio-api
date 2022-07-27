@@ -1,10 +1,9 @@
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.TestHost;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Portfolio.Api.Configuration;
 
 namespace Portfolio.Tests.Fakes
 {
@@ -29,7 +28,7 @@ namespace Portfolio.Tests.Fakes
 
         public async Task<HttpResponseMessage> PostJsonAsync(string requestUri, object content)
         {
-            var jsonContent = JsonConvert.SerializeObject(content);
+            var jsonContent = JsonSerializer.Serialize(content);
             return await PostJsonAsync(requestUri, jsonContent);
         }
 
@@ -47,7 +46,7 @@ namespace Portfolio.Tests.Fakes
 
         public async Task<HttpResponseMessage> PutJsonAsync(string requestUri, object content)
         {
-            var jsonContent = JsonConvert.SerializeObject(content);
+            var jsonContent = JsonSerializer.Serialize(content);
             return await PutJsonAsync(requestUri, jsonContent);
         }
 
@@ -68,22 +67,22 @@ namespace Portfolio.Tests.Fakes
             return await _client.PutAsync(requestUri, content);
         }
 
-        public async Task<JObject> ReadJsonAsync(HttpResponseMessage response)
+        public async Task<JsonElement> ReadJsonAsync(HttpResponseMessage response)
         {
             var json = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<JObject>(json);
+            return JsonSerializer.Deserialize<JsonElement>(json, new JsonSerializerOptions().Default());
         }
 
         public async Task<TResult> ReadAsJsonAsync<TResult>(HttpResponseMessage response)
         {
             var json = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<TResult>(json);
+            return JsonSerializer.Deserialize<TResult>(json, new JsonSerializerOptions().Default());
         }
 
         public async Task<TResult> ReadJsonAsync<TResult>(HttpResponseMessage response)
         {
             var json = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<TResult>(json);
+            return JsonSerializer.Deserialize<TResult>(json, new JsonSerializerOptions().Default());
         }
     }
 }

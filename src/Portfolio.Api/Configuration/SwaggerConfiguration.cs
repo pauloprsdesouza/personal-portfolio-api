@@ -55,6 +55,21 @@ namespace Portfolio.Api.Configuration
         {
             app.UseSwagger(options =>
             {
+                options.RouteTemplate = "swagger/swagger/{documentname}/swagger.json";
+            });
+
+            app.UseSwaggerUI(options =>
+            {
+                options.DocumentTitle = Title;
+                options.RoutePrefix = "swagger";
+                options.SwaggerEndpoint($"swagger/{Version}/swagger.json", Description);
+            });
+        }
+
+        public static void UseRedoclyDocumentation(this IApplicationBuilder app)
+        {
+            app.UseSwagger(options =>
+            {
                 options.RouteTemplate = "docs/swagger/{documentname}/swagger.json";
             });
 

@@ -3,7 +3,7 @@ using Portfolio.Domain.Categories;
 
 namespace Portfolio.Api.Models.Categories
 {
-    public class CategoryRequest
+    public class PostCategoryRequest
     {
         [Required, MaxLength(150)]
         public string Name { get; set; }

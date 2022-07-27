@@ -22,20 +22,6 @@ namespace Portfolio.Api.Controllers
         }
 
         /// <summary>
-        /// Get papers
-        /// </summary>
-        /// <remarks>
-        /// Registered Papers.
-        /// </remarks>
-        [HttpGet, AllowAnonymous]
-        [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(GetPaperResponse), StatusCodes.Status200OK)]
-        public async Task<ActionResult> List([FromQuery] GetPapersQuery queryString)
-        {
-            return Ok();
-        }
-
-        /// <summary>
         /// Create a paper
         /// </summary>
         /// <remarks>

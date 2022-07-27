@@ -16,9 +16,9 @@ namespace Portfolio.Domain.Papers
 
         public int Page { get; set; }
 
-        public string Type { get; set; }
+        public PaperType Type { get; set; }
 
-        public string Qualis { get; set; }
+        public QualisEnum Qualis { get; set; }
 
         public string UrlPublication { get; set; }
 

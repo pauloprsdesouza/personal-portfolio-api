@@ -22,20 +22,6 @@ namespace Portfolio.Api.Controllers
         }
 
         /// <summary>
-        /// Get subscribers
-        /// </summary>
-        /// <remarks>
-        /// List all subscribers registered.
-        /// </remarks>
-        [HttpGet]
-        [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(GetSubscriberResponse), StatusCodes.Status200OK)]
-        public async Task<ActionResult> List([FromQuery] GetSubscribersQuery queryString)
-        {
-            return Ok();
-        }
-
-        /// <summary>
         /// Create a subscriber
         /// </summary>
         /// <remarks>

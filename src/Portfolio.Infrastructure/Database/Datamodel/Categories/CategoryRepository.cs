@@ -25,7 +25,7 @@ namespace Portfolio.Infrastructure.Database.Datamodel.Categories
 
         public async Task<Category> Delete(Category category)
         {
-            _categories.Remove (category);
+            _categories.Remove(category);
             await _dbContext.SaveChangesAsync();
 
             return category;
@@ -34,8 +34,7 @@ namespace Portfolio.Infrastructure.Database.Datamodel.Categories
         public async Task<Category> FindById(int id)
         {
             return await _categories
-                .Where(p => p.Id == id)
-                .SingleOrDefaultAsync();
+                .Where(p => p.Id == id).SingleOrDefaultAsync();
         }
 
         public async Task<Category> Update(Category category)

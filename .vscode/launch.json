@@ -6,7 +6,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build:Portfolio.Api",
-      "program": "${workspaceFolder}/src/Portfolio.Api/bin/Debug/netcoreapp3.1/Portfolio.Api.dll",
+      "program": "${workspaceFolder}/src/Portfolio.Api/bin/Debug/net6.0/Portfolio.Api.dll",
       "args": ["--urls", "http://localhost:5000"],
       "cwd": "${workspaceFolder}/src/Portfolio.Api",
       "stopAtEntry": false,

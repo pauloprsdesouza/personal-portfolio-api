@@ -24,34 +24,6 @@ namespace Portfolio.Api.Controllers
         const string UserEmail = "paulo.prsdesouza@gmail.com";
 
         /// <summary>
-        /// Get posts from Anonymous Request.
-        /// </summary>
-        /// <remarks>
-        /// Get registered posts.
-        /// </remarks>
-        [HttpGet, Route("published"), AllowAnonymous]
-        [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(GetPostResponse), StatusCodes.Status200OK)]
-        public async Task<ActionResult> ListPublished([FromQuery] GetPostsQuery queryString)
-        {
-            return Ok();
-        }
-
-        /// <summary>
-        /// Get posts.
-        /// </summary>
-        /// <remarks>
-        /// Get registered posts.
-        /// </remarks>
-        [HttpGet]
-        [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(GetPostResponse), StatusCodes.Status200OK)]
-        public async Task<ActionResult> List([FromQuery] GetPostsQuery queryString)
-        {
-            return Ok();
-        }
-
-        /// <summary>
         /// Create a post.
         /// </summary>
         /// <remarks>
