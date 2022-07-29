@@ -25,7 +25,7 @@ namespace Portfolio.Tests
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApiDbContext>(options =>
+            services.AddEntityFrameworkInMemoryDatabase().AddDbContext<ApiDbContext>(options =>
            {
                options.UseInMemoryDatabase(Guid.NewGuid().ToString());
            });
