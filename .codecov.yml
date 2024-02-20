@@ -1,6 +1,0 @@
-codecov:
-  branch: master
-coverage:
-  range: 5..90
-  round: down
-  precision: 2
