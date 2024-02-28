@@ -3,13 +3,16 @@ slug: documenting-dotnet-api
 title: Docummenting .NET API
 authors: paulo_roberto_de_souza
 tags: [swagger, redocly]
+image: https://i.imgur.com/mErPwqL.png
+enableComments: true
 ---
 
 ## Introduction
 
+<div style={{ textAlign: 'justify' }}>
 When we are developing software, more specifically an [Application Programing Interface (API)](https://aws.amazon.com/what-is/api/), we usually code based on our own ideas and understandings. But have you ever needed to consume an API in your life? I believe so! In such cases, if it has poor documentation or lacks documentation entirely, you wouldn't know where to start. The compass (documentation) is lost in this scenario, making any integration you had in mind nearly impossible to achieve.
 
-Thanks God, that there are some approaches available to help us in this hard task, you know? When the [Swagger](https://swagger.io/), now known as [OpenAPI](https://www.openapis.org/) Specification, was created by [Tony Tam](https://www.linkedin.com/in/tonytam/) in 2011, which has the role to standardize the way APIs are described and documented, my entire life changed. I thought, ok! Now I can view my APIs in a human-readable way with descriptions and details about everything. This is so amazing because now it can possible to provide a communication with teams better, besides integrates with other APIs in a simple way. Because of this, Swagger quickly gained popularity in the developer community for its ability to streamline the process of designing, building, testing, and documenting APIs. Its success led to the formation of the OpenAPI Initiative under the Linux Foundation in 2015, ensuring its development as an industry standard for API design. This transition marked a significant milestone in the evolution of API technology, highlighting Swagger's impact on improving interoperability and communication between different software systems.
+However, there are some approaches available to help us in this hard task, you know? When the [Swagger](https://swagger.io/), now known as [OpenAPI](https://www.openapis.org/) Specification was created by [Tony Tam](https://www.linkedin.com/in/tonytam/) in 2011, which has the role to standardize the way APIs are described and documented, my entire life changed. I thought, ok! Now I can view my APIs in a human-readable way with descriptions and details about everything. This is amazing because it can possible to provide a communication with teams better, besides integrates with other APIs in a simple way. In addition, Swagger quickly gained popularity in the developer community for its ability to streamline the process of designing, building, testing, and documenting APIs. Its success led to the formation of the OpenAPI Initiative under the Linux Foundation in 2015, ensuring its development as an industry standard for API design. This transition marked a significant milestone in the evolution of API technology, highlighting Swagger's impact on improving interoperability and communication between different software systems.
 
 After that, comunities developed different versions aiming to provide [UI](https://www.figma.com/resource-library/difference-between-ui-and-ux/) and [UX](https://www.figma.com/resource-library/difference-between-ui-and-ux/) better, as an example of [Redocly](https://redocly.com/), which is a software company that specializes in API documentation and management tools, harnessing the power of the OpenAPI Specification to streamline the lifecycle of API development. Founded on the principle that high-quality documentation is crucial for effective API utilization, Redocly provides solutions that facilitate the creation, maintenance, and deployment of API documentation, enhancing developer experience and promoting better integration practices. Their flagship product, [Redoc](https://github.com/Redocly/redoc), is an open-source tool that offers a visually appealing and interactive way for developers to browse and test API documentation. Beyond Redoc, Redocly's suite includes tools for validating, bundling, and managing API definitions, catering to the needs of both small and large organizations. By focusing on the usability and accessibility of API documentation, Redocly has become a pivotal player in the API community, helping businesses to maximize the potential of their APIs through better documentation and developer engagement.
 
@@ -123,10 +126,36 @@ public static void UseSwaggerDocumentation(this IApplicationBuilder app)
 		options.SwaggerEndpoint($"swagger/{Version}/swagger.json", Description);
 	});
 }
+```
 
+> ⚠️Important! Now that almost everything is configured, open the **statup project .csproj file**, which probably is the host containing controllers, Program.cs, etc. and then add the properties below into the ``<PropertyGroup>``.
+> ```cs
+> <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+> <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+> <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+Finally, let's to call the extension methods in the Program.cs just like that, where services is **IServiceCollection** and app is **WebApplicationBuilder**.
+
+```cs
+services.AddSwaggerDocumentation();
+app.UseSwaggerDocumentation();
 ```
 
 ### Docummenting the first enpoint
+
+```cs
+/// <summary>
+/// Decribes what the endpoint does
+/// </summary>
+[HttpPost]
+[Produces(MediaTypeNames.Application.Json)]
+[ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
+public async Task<IActionResult> MyMethod()
+{
+    ...
+    return Ok(...);
+}
+```
 
 ### Running the app and voilà
 
@@ -136,5 +165,5 @@ public static void UseSwaggerDocumentation(this IApplicationBuilder app)
 ## References
 
 
-
+</div>
 ---
