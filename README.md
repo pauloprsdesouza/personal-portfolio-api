@@ -1,114 +1,29 @@
-# A REST Api for my personal-portfolio
+# Personal Portfolio API
 
-This REST Api is the Backed for [personal-porftfolio](https://github.com/pauloprsdesouza/personal-portfolio) frontend.
+[![License](https://img.shields.io/github/license/pauloprsdesouza/personal-portfolio-api)](./LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/pauloprsdesouza/personal-portfolio-api)](https://github.com/pauloprsdesouza/personal-portfolio-api/commits/main)
+[![Top Language](https://img.shields.io/github/languages/top/pauloprsdesouza/personal-portfolio-api)](https://github.com/pauloprsdesouza/personal-portfolio-api)
 
-[![CircleCI](https://img.shields.io/circleci/build/gh/pauloprsdesouza/personal-portfolio-api)](https://circleci.com/gh/pauloprsdesouza/personal-portfolio-api)
-[![codecov](https://codecov.io/gh/pauloprsdesouza/personal-portfolio-api/branch/main/graph/badge.svg?token=tNmF6vTEkJ)](https://codecov.io/gh/pauloprsdesouza/personal-portfolio-api)
+Backend API used by the personal portfolio platform for content, integrations, and service workflows.
 
-## Used Stacks 
+## Tech Stack
+- C# / .NET
+- REST API
+- Cloud-oriented backend design
 
-- dotNet Core 3.1
-- AWS DynamoDB (NoSQL)
-- AWS Lambda Function
-- AWS API Gateway
-- AWS CloudFormation
+## Architecture
+- `src/` hosts application code and domain modules.
+- API endpoints are organized around portfolio business capabilities.
+- Infrastructure and service integration concerns are isolated for maintainability.
 
-## A basic Infrastructure as a Code using AWS Cloud Formation
+## Quick Start
+1. Install .NET SDK.
+2. Restore dependencies from the project/solution in `src/`.
+3. Run the API locally.
 
-So, this code allows you to realize an automated deployment using AWS CLI.
+## Validation
+- Build and run automated tests where available.
+- Verify endpoints with your API client or local request collection.
 
-``` yaml
-AWSTemplateFormatVersion: 2010-09-09
-
-Transform: AWS::Serverless-2016-10-31
-
-Description: Personal Portfolio
-
-Parameters:
-
-  Environment:
-    Type: String
-    Description: Set the deployment environment.
-    AllowedValues:
-      - Development
-      - Staging
-      - Production
-
-  JwtSecret:
-    Type: String
-    Description: Set secret token JWT
-
-Mappings:
-  StageNameMap:
-    Development:
-      StageName: dev
-    Staging:
-      StageName: stg
-    Production:
-      StageName: prod
-  EnvironmentToPathBaseMap:
-    Development:
-      PathBase: /development
-    Staging:
-      PathBase: /staging
-    Production:
-      PathBase: /
-
-Globals:
-
-  Api:
-    OpenApiVersion: 3.0.1
-
-Resources:
-
-  Lambda:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: portfolio-api
-      Handler: Portfolio.Api::Portfolio.Api.LambdaEntryPoint::FunctionHandlerAsync
-      Runtime: dotnetcore3.1
-      MemorySize: 1024
-      Timeout: 30
-      Environment:
-        Variables:
-          ASPNETCORE_ENVIRONMENT: !Ref Environment
-      Events:
-        AnyHttpRequest:
-          Type: Api
-          Properties:
-            Path: "/{proxy+}"
-            Method: ANY
-            RestApiId: !Ref ApiGateway
-      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/AppLambdaExecutionRole
-      Tags:
-          Name: portfolio-api:Lambda
-
-  ApiGateway:
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName: !FindInMap [ StageNameMap, !Ref Environment, StageName ]
-      Name: portfolio-api
-      Tags:
-          Name: portfolio-api:ApiGateway
-
-  DynamoDBTable:
-    Type: AWS::DynamoDB::Table
-    DeletionPolicy: Retain
-    Properties:
-      TableName: portfolio-api
-      KeySchema:
-        - AttributeName: PK
-          KeyType: HASH
-        - AttributeName: SK
-          KeyType: RANGE
-      AttributeDefinitions:
-        - AttributeName: PK
-          AttributeType: S
-        - AttributeName: SK
-          AttributeType: S
-      BillingMode: PAY_PER_REQUEST
-      Tags:
-        - Key: Name
-          Value: portfolio-api:DynamoDB
-
-```
+## Contributing
+See `CONTRIBUTING.md` for contribution and PR guidelines.
